@@ -1,7 +1,16 @@
 ncs/*
 !ncs/v1.9.1
-ncs/v1.9.1/*
-!ncs/v1.9.1/zephyr
+
+**/v1.9.1/*
+!**/v1.9.1/zephyr
+
+**/zephyr/*
+!**/zephyr/samples
+
+**/samples/*
+!**/samples/custom
+
+
 
 *.o
 *.a
@@ -12,54 +21,10 @@ ncs/v1.9.1/*
 *.swp
 *.swo
 *~
-build*/
-!ncs/v1.9.1/zephyr/doc/guides/build
-!ncs/v1.9.1/zephyr/tests/drivers/build_all
-ncs/v1.9.1/zephyr/cscope.*
-ncs/v1.9.1/zephyr/.dir
-
 /*.patch
 
-# The .cache directory will be used to cache toolchain capabilities if
-# no suitable out-of-tree directory is found.
-ncs/v1.9.1/zephyr/.cache
 
-outdir
-outdir-*
-ncs/v1.9.1/zephyr/scripts/basic/fixdep
-ncs/v1.9.1/zephyr/scripts/gen_idt/gen_idt
-ncs/v1.9.1/zephyr/doc/_build
-ncs/v1.9.1/zephyr/doc/doxygen
-ncs/v1.9.1/zephyr/doc/xml
-ncs/v1.9.1/zephyr/doc/html
-ncs/v1.9.1/zephyr/doc/boards
-ncs/v1.9.1/zephyr/doc/samples
-ncs/v1.9.1/zephyr/doc/latex
-ncs/v1.9.1/zephyr/doc/themes/zephyr-docs-theme
-sanity-out*
-twister-out*
-bsim_bt_out
-ncs/v1.9.1/zephyr/scripts/grub
-ncs/v1.9.1/zephyr/doc/reference/kconfig/*.rst
-ncs/v1.9.1/zephyr/doc/doc.warnings
-ncs/v1.9.1/zephyr/.*project
-ncs/v1.9.1/zephyr/.settings
-ncs/v1.9.1/zephyr/.envrc
-ncs/v1.9.1/zephyr/.vscode
-hide-defaults-note
-venv
-ncs/v1.9.1/zephyr/.venv
-ncs/v1.9.1/zephyr/.DS_Store
 
-# CI output
-ncs/v1.9.1/zephyr/compliance.xml
-ncs/v1.9.1/zephyr/_error.types
 
-# Tag files
-GPATH
-GRTAGS
-GTAGS
-TAGS
-tags
 
-ncs/v1.9.1/zephyr/.idea
+
