@@ -1,4 +1,4 @@
-ncs/
+ncs/*
 !ncs/v1.9.1
 ncs/v1.9.1/*
 !ncs/v1.9.1/zephyr
