@@ -1,14 +1,15 @@
 ncs/*
-!ncs/v1.9.1
+!ncs/v2.1.2
 
-**/v1.9.1/*
-!**/v1.9.1/zephyr
+**/v2.1.2/*
+!**/v2.1.2/zephyr
 
 **/zephyr/*
 !**/zephyr/samples
 
 **/samples/*
 !**/samples/custom
+
 
 
 
