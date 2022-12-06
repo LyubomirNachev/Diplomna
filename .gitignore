@@ -1,3 +1,6 @@
+*
+!ncs
+!apps
 ncs/*
 !ncs/v2.1.2
 
