@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "http://dl.espressif.com/dl/schemas/esp_idf",
+  "_comment": "Configuration file for ESP-IDF IDEs.",
+  "_warning": "Use / or \\ when specifying path. Single backslash is not allowed by JSON format.",
+  "gitPath": "\\Git\\cmd\\git.exe",
+  "idfToolsPath": "c:\\Diplomna",
+  "idfSelectedId": "esp-idf-5e052e95b0701aee924e9aa4d6890b61",
+  "idfInstalled": {
+    "esp-idf-5e052e95b0701aee924e9aa4d6890b61": {
+      "version": "5.0.0",
+      "python": "c:\\Diplomna\\python_env\\idf5.0_py3.8_env\\Scripts\\python.exe",
+      "path": "c:\\Diplomna\\esp-idf"
+    }
+  }
+}
