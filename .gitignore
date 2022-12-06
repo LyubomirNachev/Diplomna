@@ -1,8 +1,10 @@
 *
 !/nrf-apps/
-!nrf-apps/*
+!nrf-apps/**
+
 !/esp32-apps/
-!esp32-apps/*
+!esp32-apps/**
+
 !.gitignore
 
 
