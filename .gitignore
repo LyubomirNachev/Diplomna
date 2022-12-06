@@ -1,5 +1,6 @@
 *
-!apps/
+*/
+!apps/*
 !.gitignore
 
 #ncs/*
