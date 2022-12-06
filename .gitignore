@@ -1,6 +1,6 @@
 *
 */
-!apps/*
+!nrf-apps/*
 !.gitignore
 
 #ncs/*
