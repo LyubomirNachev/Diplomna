@@ -1,5 +1,9 @@
 
-/*
+dist/
+esp-idf/
+ncs/
+python_env/
+tools/
 
 !nrf-apps/*
 !.gitignore
