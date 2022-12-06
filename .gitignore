@@ -1,13 +1,14 @@
 
-dist/
-esp-idf/
-ncs/
-python_env/
-tools/
+#dist/
+#esp-idf/
+#ncs/
+#python_env/
+#tools/
 
 !nrf-apps/*
 !.gitignore
 
+*
 #ncs/*
 #!ncs/v2.1.2
 
