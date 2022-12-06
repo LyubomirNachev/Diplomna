@@ -1,31 +1,17 @@
 *
-!ncs
 !apps
-ncs/*
-!ncs/v2.1.2
+#ncs/*
+#!ncs/v2.1.2
 
-**/v2.1.2/*
-!**/v2.1.2/zephyr
+#**/v2.1.2/*
+#!**/v2.1.2/zephyr
 
-**/zephyr/*
-!**/zephyr/samples
+#**/zephyr/*
+#!**/zephyr/samples
 
-**/samples/*
-!**/samples/custom
+#**/samples/*
+#!**/samples/custom
 
-
-
-
-*.o
-*.a
-*.d
-*.cmd
-*.log
-*.pyc
-*.swp
-*.swo
-*~
-/*.patch
 
 
 
