@@ -3,13 +3,26 @@
 		zephyr,console = &cdc_acm_uart0;
 	};
 };
-/ {
-    chosen{
-        zephyr,entropy=&rng;
-    };
-};
+// / {
+// 	chosen {
+// 		zephyr,shell-uart = &cdc_acm_uart0;
+// 	};
+// };
+
 &zephyr_udc0 {
 	cdc_acm_uart0: cdc_acm_uart0 {
 		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+};
+
+&uart0 {
+	status = "okay";
+	hw-flow-control;
+};
+
+/ {
+	chosen {
+		zephyr,entropy = &rng;
 	};
 };

@@ -1,0 +1,8 @@
+menu "Zephyr Kernel"
+    source "Kconfig.zephyr"
+    endmenu
+    
+    module = OT_COMMAND_LINE_INTERFACE
+    module-str = ot_cli
+    source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+    
