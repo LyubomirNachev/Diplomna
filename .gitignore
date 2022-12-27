@@ -5,6 +5,12 @@
 !/esp32-apps/
 !esp32-apps/**
 
+!/logs/
+!logs/**
+
+!/libraries/
+!libraries/**
+
 !.gitignore
 
 
