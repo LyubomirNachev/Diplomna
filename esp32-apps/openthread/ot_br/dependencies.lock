@@ -1,0 +1,21 @@
+dependencies:
+  espressif/esp_ot_cli_extension:
+    component_hash: 7acf09f19390d8a8635b83966752e217781986399c77159ce9e83547862316d6
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 0.1.4
+  espressif/mdns:
+    component_hash: 2e95568e6fb1b1e5933217556db18b29affd4f706a6d90636fbb88dd32fc3e29
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.0.7
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.0.0
+manifest_hash: c862bd23cc87bd38d4446a9fefbfcb3422bb8c3d3c4a65bb32f654439b2da598
+target: esp32
+version: 1.0.0

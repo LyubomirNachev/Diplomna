@@ -1,0 +1,9 @@
+{
+    "idf.portWin": "COM14",
+    "idf.adapterTargetName": "esp32",
+    "nrf-connect.toolchain.path": "c:\\Diplomna\\ncs\\toolchains\\v2.1.2",
+    "nrf-connect.topdir": "c:\\Diplomna\\ncs\\v2.1.2",
+    "nrf-connect.applications": [
+        "c:\\Diplomna\\nrf-apps\\coprocessor"
+    ]
+}
