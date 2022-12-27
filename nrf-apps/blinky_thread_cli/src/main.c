@@ -20,7 +20,7 @@ void main(void)
 		return;
 	}
 
-	dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_shell-uart));
+	dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_shell_uart));
 	if (dev == NULL) {
 		printk("Failed to find specific UART device");
 		return;
