@@ -1,15 +1,47 @@
-/*
- * Copyright (c) 2019 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <zephyr/zephyr.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/sensor.h>
 #include <stdio.h>
 #include <zephyr/sys/util.h>
 
+
+void main(void){
+	const struct device *dev
+	dev = DEVICE_DT_GET_ONE(bh_bh1750);
+	
+	if (!device_is_ready(dev)) {
+		printk("sensor: device not ready.\n");
+		return;
+	}
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 #define LUX_ALERT_DELTA 50
 
 static volatile bool alerted;
@@ -21,12 +53,12 @@ static void trigger_handler(const struct device *dev,
 #ifdef CONFIG_ISL29035_TRIGGER
 	alerted = !alerted;
 	k_sem_give(&sem);
-#endif /* CONFIG_ISL29035_TRIGGER */
+#endif /* CONFIG_ISL29035_TRIGGER *
 }
 
 static const char *now_str(void)
 {
-	static char buf[16]; /* ...HH:MM:SS.MMM */
+	static char buf[16]; /* ...HH:MM:SS.MMM *
 	uint32_t now = k_uptime_get_32();
 	unsigned int ms = now % MSEC_PER_SEC;
 	unsigned int s;
@@ -121,3 +153,4 @@ void main(void)
 		}
 	}
 }
+*/

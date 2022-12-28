@@ -13,6 +13,13 @@
 
 !.gitignore
 
+!ncs/v2.1.2/zephyr/drivers/sensor/CMakeLists.txt
+!ncs/v2.1.2/zephyr/drivers/sensor/Kconfig
+!ncs/v2.1.2/zephyr/drivers/sensor/bh1750/bh1750.c
+!ncs/v2.1.2/zephyr/drivers/sensor/bh1750/bh1750.h
+!ncs/v2.1.2/zephyr/drivers/sensor/bh1750/Kconfig
+!ncs/v2.1.2/zephyr/drivers/sensor/bh1750/CMakeLists.txt
+!ncs/v2.1.2/zephyr/dts/bindings/sensor/rohm,bh1750.yaml
 
 #ncs/*
 #!ncs/v2.1.2
