@@ -4,10 +4,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-&i2c0 { /* SDA P0.26, SCL P0.27, ALERT P1.11 */
+&i2c0 {
 	bh1750@23 {
 		compatible = "rohm,bh1750";
-		status = "okay";
 		reg = <0x23>;
 	};
 };

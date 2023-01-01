@@ -6,7 +6,7 @@ menuconfig BH1750
 	help
 	  Enable driver for the BH1750 light sensor.
 
-if BH1750
+#if BH1750
 
 # config ISL29035_THREAD_PRIORITY
 # 	int "Thread priority"
@@ -77,4 +77,4 @@ if BH1750
 
 
 
-endif # BH1750
+#endif # BH1750

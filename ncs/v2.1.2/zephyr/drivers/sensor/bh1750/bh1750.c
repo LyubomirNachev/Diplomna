@@ -6,11 +6,14 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/sys/__assert.h>
 #include <zephyr/logging/log.h>
+#include <bh1750.h>
 
-#include "bh1750.h"
 LOG_MODULE_REGISTER(BH1750, CONFIG_SENSOR_LOG_LEVEL);
 
 float measuringTimeFactor;
+
+static const struct device *dev = DEVICE_DT_GET(I2C_NODE);
+static uint8_t i2c_buffer[2];
 
 void getLux(){
 	uint16_t raw_lux;
@@ -52,16 +55,24 @@ void setMeasuringTime(){
 
 uint16_t readBH1750(){
   uint8_t MSbyte, LSbyte;
-  //Wire.requestFrom(BH_1750, 2);
-  //if(Wire.available()){
-    //MSbyte=Wire.read();
-    //LSbyte=Wire.read(); 
-  //}
+  do{
+    err = i2c_read(dev, i2c_buffer, 2, BH1750_ADDRESS_1);
+    if (err < 0){
+      printk("Read Failed: %d\n", err);
+      break;
+    }
+  }while(false);
+  MSbyte = i2c_buffer[0];
+  LSbyte = i2c_buffer[1];
   return ((MSbyte<<8) + LSbyte);
 }
 
 void writeBH1750(uint8_t val){
-  //Wire.beginTransmission(BH_1750);
-  //Wire.write(val);
-  //Wire.endTransmission();
+  do{
+    err = i2c_write(dev, i2c_buffer, 1, BH1750_ADDRESS_1);
+    if (err < 0){
+      printk("Write Failed: %d\n", err);
+      break;
+    }
+  }while(false);
 }
