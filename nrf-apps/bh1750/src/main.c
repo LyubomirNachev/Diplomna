@@ -8,7 +8,6 @@
 #include <zephyr/usb/usb_device.h>
 #include <zephyr/drivers/uart.h>
 
-
 void main(void){
 	mode = CHM;
   	measuringTimeFactor = 1;
@@ -37,7 +36,7 @@ void main(void){
 
 	while(1){
 		getLux();
-		k_msleep(100);
+		k_sleep(K_MSEC(100));
 	}
 }
 

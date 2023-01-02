@@ -6,7 +6,7 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/sys/__assert.h>
 #include <zephyr/logging/log.h>
-#include <bh1750.h>
+#include "bh1750.h"
 
 LOG_MODULE_REGISTER(BH1750, CONFIG_SENSOR_LOG_LEVEL);
 
@@ -14,6 +14,7 @@ float measuringTimeFactor;
 
 static const struct device *dev = DEVICE_DT_GET(I2C_NODE);
 static uint8_t i2c_buffer[2];
+int err;
 
 void getLux(){
 	uint16_t raw_lux;
