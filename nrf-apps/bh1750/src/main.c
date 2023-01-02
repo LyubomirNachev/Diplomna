@@ -7,18 +7,16 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/usb/usb_device.h>
 #include <zephyr/drivers/uart.h>
+#include "../../../ncs/v2.1.2/zephyr/drivers/sensor/bh1750/bh1750.h"
 
 void main(void){
-	mode = CHM;
-  	measuringTimeFactor = 1;
   	setMode();
-  	setMeasuringTime(); 
   	k_msleep(200);
 
-	if (!device_is_ready(dev)) {
-		printk("sensor: device not ready.\n");
-		return;
-	}
+	// if (!device_is_ready()) {
+	// 	printk("sensor: device not ready.\n");
+	// 	return;
+	// }
 
 	const struct device *dev1 = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	uint32_t dtr = 0;

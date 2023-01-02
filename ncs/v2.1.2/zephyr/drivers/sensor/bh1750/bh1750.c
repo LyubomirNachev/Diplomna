@@ -10,15 +10,17 @@
 
 LOG_MODULE_REGISTER(BH1750, CONFIG_SENSOR_LOG_LEVEL);
 
-float measuringTimeFactor;
+float measuringTimeFactor = 1;
 
 static const struct device *dev = DEVICE_DT_GET(I2C_NODE);
 static uint8_t i2c_buffer[2];
 int err;
 
-void getLux(){
+
+extern void getLux(){
 	uint16_t raw_lux;
 	float lux;
+  mode = CHM;
 	raw_lux = readBH1750();
 	if((mode==CHM_2)||(mode==OTH_2)){
 		lux = (raw_lux/2.4)/measuringTimeFactor;
@@ -28,25 +30,25 @@ void getLux(){
 	printk("Light: %flx", lux);
 }
 
-void powerDown(){
+extern void powerDown(){
 	writeBH1750(BH1750_POWER_DOWN);
 }
 
-void powerOn(){
+extern void powerOn(){
 	writeBH1750(BH1750_POWER_ON);
 	setMode();
 }
 
-void dataRegReset(){
+extern void dataRegReset(){
   writeBH1750(BH1750_DATA_REG_RESET);
 }
 
-void setMode(){
+extern void setMode(){
   writeBH1750(mode);
 }
 
-void setMeasuringTime(){
-  uint8_t mt = round(measuringTimeFactor*69);
+extern void setMeasuringTime(){
+  uint8_t mt = measuringTimeFactor*69;
   uint8_t highByteMT = ((mt>>5) | 0b01000000);
   uint8_t lowByteMT = (mt & 0b01111111);
   lowByteMT |= 0b01100000;
@@ -54,7 +56,7 @@ void setMeasuringTime(){
   writeBH1750(lowByteMT);
 }
 
-uint16_t readBH1750(){
+extern uint16_t readBH1750(){
   uint8_t MSbyte, LSbyte;
   do{
     err = i2c_read(dev, i2c_buffer, 2, BH1750_ADDRESS_1);
@@ -68,7 +70,7 @@ uint16_t readBH1750(){
   return ((MSbyte<<8) + LSbyte);
 }
 
-void writeBH1750(uint8_t val){
+extern void writeBH1750(uint8_t val){
   do{
     err = i2c_write(dev, i2c_buffer, 1, BH1750_ADDRESS_1);
     if (err < 0){
