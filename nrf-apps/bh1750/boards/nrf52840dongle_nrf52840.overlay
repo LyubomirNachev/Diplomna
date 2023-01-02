@@ -8,6 +8,7 @@
 	bh1750@23 {
 		compatible = "rohm,bh1750";
 		reg = <0x23>;
+		status = "okay";
 	};
 };
 / {

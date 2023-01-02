@@ -30,6 +30,10 @@
 !ncs/v2.1.2/zephyr/dts/bindings
 !ncs/v2.1.2/zephyr/dts/bindings/sensor/
 !ncs/v2.1.2/zephyr/dts/bindings/sensor/rohm,bh1750.yaml
+!ncs/v2.1.2/zephyr/boards
+!ncs/v2.1.2/zephyr/boards/arm
+!ncs/v2.1.2/zephyr/boards/arm/nrf52840dongle_nrf52840
+!ncs/v2.1.2/zephyr/boards/arm/nrf52840dongle_nrf52840/nrf52840dongle_nrf52840-pinctrl.dtsi
 
 #ncs/*
 #!ncs/v2.1.2

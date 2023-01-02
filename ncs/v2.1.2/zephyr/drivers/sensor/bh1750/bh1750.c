@@ -1,5 +1,7 @@
 #define DT_DRV_COMPAT rohm_bh1750
 
+#include <zephyr/device.h>
+#include <zephyr/devicetree.h> 
 #include <zephyr/kernel.h>
 #include <zephyr/init.h>
 #include <zephyr/drivers/i2c.h>
@@ -27,7 +29,7 @@ extern void getLux(){
 	}else{
 		lux = (raw_lux/1.2)/measuringTimeFactor;
 	}
-	printk("Light: %flx", lux);
+	printk("Light: %f lx \n", lux);
 }
 
 extern void powerDown(){
@@ -58,13 +60,10 @@ extern void setMeasuringTime(){
 
 extern uint16_t readBH1750(){
   uint8_t MSbyte, LSbyte;
-  do{
-    err = i2c_read(dev, i2c_buffer, 2, BH1750_ADDRESS_1);
-    if (err < 0){
-      printk("Read Failed: %d\n", err);
-      break;
-    }
-  }while(false);
+  err = i2c_read(dev, i2c_buffer, 2, BH1750_ADDRESS_1);
+  if (err < 0){
+    printk("Read Failed: %d\n", err);
+  }
   MSbyte = i2c_buffer[0];
   LSbyte = i2c_buffer[1];
   return ((MSbyte<<8) + LSbyte);

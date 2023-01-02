@@ -6,7 +6,7 @@ compatible: "rohm,bh1750"
 
 include: i2c-device.yaml
 
-# properties:
+#  properties:
 #     int-gpios:
 #       type: phandle-array
 #       required: false
@@ -14,3 +14,4 @@ include: i2c-device.yaml
 #         The INT pin defaults to active low when produced by the sensor.
 #         The property value should ensure the flags properly describe the
 #         signal that is presented to the driver.
+
