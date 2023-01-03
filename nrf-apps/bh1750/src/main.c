@@ -7,15 +7,9 @@
 #include <zephyr/sys/printk.h>
 #include <zephyr/usb/usb_device.h>
 #include <zephyr/drivers/uart.h>
-//#include "../../../ncs/v2.1.2/zephyr/drivers/sensor/bh1750/bh1750.h"
 
 
 void main(void){
-  	setMode();
-  	k_sleep(K_MSEC(200));
-
-
-
 	const struct device *dev1 = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	uint32_t dtr = 0;
 
@@ -29,7 +23,9 @@ void main(void){
 		/* Give CPU resources to low priority threads. */
 		k_sleep(K_MSEC(100));
 	}
-
+	powerOn();
+    //setMode();
+    setMeasuringTime(); 
 	while(1){
 		getLux();
 		k_sleep(K_MSEC(100));
