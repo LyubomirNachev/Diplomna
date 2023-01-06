@@ -1,0 +1,7 @@
+sample:
+  name: LIS3DH Accelerometer Monitor
+tests:
+  sample.sensor.lis3dh:
+    harness: sensor
+    tags: samples sensor
+    depends_on: i2c lis3dh
