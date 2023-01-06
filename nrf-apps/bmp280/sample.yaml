@@ -1,0 +1,31 @@
+sample:
+  name: BMP280 Sensor sample
+tests:
+  sample.sensor.bmp280:
+    harness: console
+    tags: sensors
+    platform_allow: nrf52840dongle_nrf52840
+    integration_platforms:
+      - nrf52840dongle_nrf52840
+    harness_config:
+        type: one_line
+        regex:
+            - "temp: (.*); press: (.*); humidity: (.*)"
+        fixture: fixture_i2c_bmp280
+  sample.sensor.bmp280.i2c:
+    harness: console
+    tags: sensors
+    depends_on: i2c bmp280
+    extra_args: "DTC_OVERLAY_FILE=nrf52840dongle_nrf52840.overlay"
+    harness_config:
+        type: one_line
+        regex:
+            - "temp: (.*); press: (.*); humidity: (.*)"
+        fixture: fixture_i2c_bmp280
+  sample.usb.console:
+    depends_on: usb_device usb_cdc
+    tags: usb
+    platform_exclude: native_posix native_posix_64
+    harness: console
+    harness_config:
+      fixture: fixture_usb_cdc

@@ -1,0 +1,122 @@
+# BMP280 temperature and pressure sensor configuration options
+
+# Copyright (c) 2016 Intel Corporation
+# Copyright (c) 2017 IpTronix S.r.l.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig BMP280
+	bool "BMP280/BMP280 sensor"
+	depends on I2C || SPI
+	help
+	  Enable driver for BMP280 I2C-based or SPI-based temperature and pressure sensor.
+
+if BMP280
+
+choice
+	prompt "BMP280 sampling mode"
+	default BMP280_MODE_NORMAL
+	help
+	  Select sampling mode. In normal mode continuous measurements are
+	  performed, whereas in forced mode only single measurement is performed.
+config BMP280_MODE_NORMAL
+	bool "normal"
+config BMP280_MODE_FORCED
+	bool "forced"
+endchoice
+
+choice
+	prompt "BMP280 temperature oversampling"
+	default BMP280_TEMP_OVER_2X
+	help
+	  Select temperature oversampling for the BMP280 sensor.  Higher values
+	  lead to more accurate readings, but higher power consumption.
+config BMP280_TEMP_OVER_1X
+	bool "x1"
+config BMP280_TEMP_OVER_2X
+	bool "x2"
+config BMP280_TEMP_OVER_4X
+	bool "x4"
+config BMP280_TEMP_OVER_8X
+	bool "x8"
+config BMP280_TEMP_OVER_16X
+	bool "x16"
+endchoice
+
+choice
+	prompt "BMP280 pressure oversampling"
+	default BMP280_PRESS_OVER_16X
+	help
+	  Select pressure oversampling for the BMP280 sensor.  Higher values
+	  lead to more accurate readings, but higher power consumption.
+config BMP280_PRESS_OVER_1X
+	bool "x1"
+config BMP280_PRESS_OVER_2X
+	bool "x2"
+config BMP280_PRESS_OVER_4X
+	bool "x4"
+config BMP280_PRESS_OVER_8X
+	bool "x8"
+config BMP280_PRESS_OVER_16X
+	bool "x16"
+endchoice
+
+choice
+	prompt "BMP280 humidity oversampling"
+	default BMP280_HUMIDITY_OVER_16X
+	help
+	  Select humidity oversampling for the BMP280 sensor.  Higher values
+	  lead to more accurate readings, but higher power consumption.
+config BMP280_HUMIDITY_OVER_1X
+	bool "x1"
+config BMP280_HUMIDITY_OVER_2X
+	bool "x2"
+config BMP280_HUMIDITY_OVER_4X
+	bool "x4"
+config BMP280_HUMIDITY_OVER_8X
+	bool "x8"
+config BMP280_HUMIDITY_OVER_16X
+	bool "x16"
+endchoice
+
+choice
+	prompt "BMP280 standby time"
+	default BMP280_STANDBY_1000MS
+	help
+	  Select standby time between measurements for the BMP280 sensor.
+	  Higher values lead to lower power consumption.
+config BMP280_STANDBY_05MS
+	bool "0.5ms"
+config BMP280_STANDBY_62MS
+	bool "62.5ms"
+config BMP280_STANDBY_125MS
+	bool "125ms"
+config BMP280_STANDBY_250MS
+	bool "250ms"
+config BMP280_STANDBY_500MS
+	bool "500ms"
+config BMP280_STANDBY_1000MS
+	bool "1000ms"
+config BMP280_STANDBY_2000MS
+	bool "2000ms BMP280 / 10ms BMP280"
+config BMP280_STANDBY_4000MS
+	bool "4000ms BMP280 / 20ms BMP280"
+endchoice
+
+choice
+	prompt "BMP280 filter coefficient"
+	default BMP280_FILTER_4
+	help
+	  Select the filter coefficient for the BMP280 sensor.
+config BMP280_FILTER_OFF
+	bool "filter off"
+config BMP280_FILTER_2
+	bool "2"
+config BMP280_FILTER_4
+	bool "4"
+config BMP280_FILTER_8
+	bool "8"
+config BMP280_FILTER_16
+	bool "16"
+endchoice
+
+endif # BMP280
