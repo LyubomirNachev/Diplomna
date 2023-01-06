@@ -1,80 +1,31 @@
 menuconfig BH1750
 	bool "BH1750 light sensor"
 	default y
-	depends on DT_HAS_ROHM_BH1750_ENABLED  ##################################################################
 	select I2C
 	help
 	  Enable driver for the BH1750 light sensor.
 
-#if BH1750
+if BH1750
 
-# config ISL29035_THREAD_PRIORITY
-# 	int "Thread priority"
-# 	default 10
-# 	help
-# 	  Priority of thread used to handle the timer and threshold triggers.
+choice
+	prompt "Operating mode"
+	default BH1750_MODE_CHM
+	help
+	   Choose the operation mode for the bh1750 light sensor
 
-# choice
-# 	prompt "Full scale lux range"
-# 	default ISL29035_LUX_RANGE_1K
-# 	help
-# 	  Maximum allowable lux value. Lower range values offer better
-# 	  resolution.
+config BH1750_MODE_CHM
+	bool "0b00010000"
+config BH1750_MODE_CHM_2
+	bool "0b00010001"
+config BH1750_MODE_CLM
+	bool "0b00010011"
+config BH1750_MODE_OTH
+	bool "0b00100000"
+config BH1750_MODE_OTH_2
+	bool "0b00100001"
+config BH1750_MODE_OTL
+	bool "0b00100011"
 
-# config ISL29035_LUX_RANGE_1K
-# 	bool "1000"
+endchoice 
 
-# config ISL29035_LUX_RANGE_4K
-# 	bool "4000"
-
-# config ISL29035_LUX_RANGE_16K
-# 	bool "16000"
-
-# config ISL29035_LUX_RANGE_64K
-# 	bool "64000"
-
-# endchoice
-
-# choice
-# 	prompt "Integration time"
-# 	default ISL29035_INTEGRATION_TIME_105K
-# 	help
-# 	  The sampling period of the internal ADC of the light sensor.
-# 	  Lower integration time values mean lower ADC resolution.
-
-# config ISL29035_INTEGRATION_TIME_26
-# 	bool "0.0256 ms"
-
-# config ISL29035_INTEGRATION_TIME_410
-# 	bool "0.41 ms"
-
-# config ISL29035_INTEGRATION_TIME_6500
-# 	bool "6.5 ms"
-
-# config ISL29035_INTEGRATION_TIME_105K
-# 	bool "105 ms"
-
-# endchoice
-
-# choice
-# 	prompt "Active sensing mode"
-# 	default ISL29035_MODE_ALS
-# 	help
-# 	  Sensing mode in which the ISL29035 will function. The chip can be
-# 	  configured either for either ambient light or infrared sensing.
-
-# config ISL29035_MODE_ALS
-# 	bool "ambient light"
-# 	help
-# 	  Sensing mode for ambient light spectrum.
-
-# config ISL29035_MODE_IR
-# 	bool "infrared"
-# 	help
-# 	  Sensing mode for infrared spectrum.
-
-# endchoice
-
-
-
-#endif # BH1750
+endif

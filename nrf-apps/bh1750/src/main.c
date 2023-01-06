@@ -24,7 +24,6 @@ void main(void){
 		k_sleep(K_MSEC(100));
 	}
 	powerOn();
-    //setMode();
     setMeasuringTime(); 
 	while(1){
 		getLux();
