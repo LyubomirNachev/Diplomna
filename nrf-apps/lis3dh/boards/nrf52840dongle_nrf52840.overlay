@@ -1,6 +1,6 @@
 &i2c0 {
-	lis3dh@18 {
-		compatible = "st,lis3dh";
+	lis2dh@18 {
+		compatible = "st,lis2dh";
 		reg = <0x18>;
 		status = "okay";
 	};
