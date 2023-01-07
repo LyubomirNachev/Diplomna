@@ -1,5 +1,15 @@
+/*
+ * Copyright (c) 2020 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+
+#if defined(CONFIG_BT)
+#include "ble.h"
+#endif
 
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
@@ -55,4 +65,9 @@ void main(void)
 #endif
 
 	LOG_INF(WELLCOME_TEXT);
+
+#if CONFIG_BT
+	ble_enable();
+#endif
+
 }
