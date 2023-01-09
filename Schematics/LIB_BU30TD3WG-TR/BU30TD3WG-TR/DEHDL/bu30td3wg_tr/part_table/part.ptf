@@ -1,0 +1,11 @@
+FILE_TYPE = MULTI_PHYS_TABLE;
+
+PART 'BU30TD3WG_TR'
+CLASS = DISCRETE
+{========================================================================================}
+:"MANUFACTURER_NAME", "MANUFACTURER_PART_NUMBER"= "PART_NUMBER", "JEDEC_TYPE", "PACK_TYPE", "MOUSER_PART_NUMBER", "MOUSER_PRICE/STOCK", "ARROW_PART_NUMBER", "ARROW_PRICE/STOCK", "MOUSER_TESTING_PART_NUMBER", "MOUSER_TESTING_PRICE/STOCK", "DESCRIPTION", "DATASHEET", "HEIGHT";
+{========================================================================================}
+ "ROHM Semiconductor", "BU30TD3WG-TR" (!) = "", "SOT95P280X125-5N", "SOT23 (5-Pin)", "755-BU30TD3WG-TR", "https://www.mouser.com/Search/Refine.aspx?Keyword=755-BU30TD3WG-TR", "", "", "", "", "ROHM - BU30TD3WG-TR - LDO, FIXED, 3V, 0.2A, SSOP-5", "https://componentsearchengine.com/Datasheets/2/BU30TD3WG-TR.pdf", "1.25 mm"
+END_PART
+
+END.

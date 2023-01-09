@@ -1,0 +1,9 @@
+Manufacturer=ROHM Semiconductor
+PartNumber=BU30TD3WG-TR
+PartCategory=Power Supply
+PackageCategory=SOT23 (5-Pin)
+PinCount=5
+Version=2.2
+Released=2017-09-19 05:03:48
+Downloaded=2023-01-09 20:35:58
+3D=Y

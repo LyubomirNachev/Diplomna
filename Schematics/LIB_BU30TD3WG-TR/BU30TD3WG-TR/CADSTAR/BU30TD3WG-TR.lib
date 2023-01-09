@@ -1,0 +1,20 @@
+.BU30TD3WG-TR :1 ;ROHM - BU30TD3WG-TR - LDO, FIXED, 3V, 0.2A, SSOP-5
+SOT95P280X125-5N
+*STM PS
+*NGS
+*PLB 1="VIN" 2="GND" 3="STBY" 4="N.C." 5="VOUT"
+*MXP 5
+*DFN BU30TD3WG-TR
+~!Manufacturer_Name (ROHM Semiconductor)
+~!Manufacturer_Part_Number (BU30TD3WG-TR)
+~!Mouser Part Number (755-BU30TD3WG-TR)
+~!Link Mouser Price/Stock (https://www.mouser.com/Search/Refine.aspx?Keyword=755-BU30TD3WG-TR)
+~!Arrow Part Number (-)
+~!Arrow Price/Stock (-)
+~!Mouser Testing Part Number (-)
+~!Mouser Testing Price/Stock (-)
+~!Link Datasheet (https://componentsearchengine.com/Datasheets/2/BU30TD3WG-TR.pdf)
+~!Height (1.25mm)
+~!3D_Model (BU30TD3WG-TR)
+BU30TD3WG-TR
+1.1!P 2.1!G 3.1!I 4.1!U 5.1!Y 
