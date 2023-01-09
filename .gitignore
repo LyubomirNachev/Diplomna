@@ -8,8 +8,8 @@
 !/logs/
 !logs/**
 
-!/libraries/
-!libraries/**
+!/Schematics/
+!Schematics/**
 
 !.gitignore
 
