@@ -29,6 +29,9 @@ LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 void main(void)
 {
 #if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_shell_uart), zephyr_cdc_acm_uart)
+	//nrf_802154_init();
+	//nrf_802154_txpower_set(8);
+	//nrf_radio_txpower_set(RADIO_TXPOWER_TXPOWER_Pos8dBm, 8);
 	int ret;
 	const struct device *dev;
 	uint32_t dtr = 0U;

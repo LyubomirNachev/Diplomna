@@ -3,6 +3,8 @@
 
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
+#include <zephyr/net/ieee802154.h>
+#include <zephyr/net/ieee802154_radio.h>
 
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
@@ -53,6 +55,5 @@ void main(void)
 	/* Data Set Ready - the NCP SoC is ready to communicate */
 	(void)uart_line_ctrl_set(dev, UART_LINE_CTRL_DSR, 1);
 #endif
-
 	LOG_INF(WELLCOME_TEXT);
 }
