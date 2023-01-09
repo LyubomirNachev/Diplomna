@@ -9,31 +9,53 @@
 // * Connecting ADC channels
 
 // For more help, browse the DeviceTree documentation at https://docs.zephyrproject.org/latest/guides/dts/index.html
-// You can also visit the nRF DeviceTree extension documentation at https://nrfconnect.github.io/vscode-nrf-connect/devicetree/nrfdevicetree.html
+// // You can also visit the nRF DeviceTree extension documentation at https://nrfconnect.github.io/vscode-nrf-connect/devicetree/nrfdevicetree.html
+// &i2c0 {
+//     status = "okay";
+// 	bme688: bme688@76 {
+// 		compatible = "bosch,bme688";
+// 		reg = <0x76>;
+// 		label = "BME688";
+// 	};
+// };
+// &zephyr_udc0 {
+// 	cdc_acm_uart0: cdc_acm_uart0 {
+// 		compatible = "zephyr,cdc-acm-uart";
+// 		label = "CDC_ACM_0";
+// 	};
+// };
+
+// / {
+// 	/*
+// 	* In some default configurations within the nRF Connect SDK,
+// 	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.
+// 	* This devicetree overlay ensures that default is overridden wherever it
+// 	* is set, as this application uses the RNG node for entropy exclusively.
+// 	*/
+// 	chosen {
+// 		zephyr,entropy = &rng;
+//         zephyr,console = &cdc_acm_uart0;
+// 	};
+// };
+
+
+
+
 &i2c0 {
-    status = "okay";
-	bme688: bme688@76 {
+	bme688@76 {
 		compatible = "bosch,bme688";
 		reg = <0x76>;
-		label = "BME688";
+		status = "okay";
 	};
 };
-&zephyr_udc0 {
-	cdc_acm_uart0: cdc_acm_uart0 {
-		compatible = "zephyr,cdc-acm-uart";
-		label = "CDC_ACM_0";
+/ {
+	chosen {
+		zephyr,console = &cdc_acm_uart0;
 	};
 };
 
-/ {
-	/*
-	* In some default configurations within the nRF Connect SDK,
-	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.
-	* This devicetree overlay ensures that default is overridden wherever it
-	* is set, as this application uses the RNG node for entropy exclusively.
-	*/
-	chosen {
-		zephyr,entropy = &rng;
-        zephyr,console = &cdc_acm_uart0;
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
 	};
 };
