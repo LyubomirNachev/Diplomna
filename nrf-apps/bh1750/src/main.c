@@ -8,7 +8,6 @@
 #include <zephyr/usb/usb_device.h>
 #include <zephyr/drivers/uart.h>
 
-
 void main(void){
 	const struct device *dev1 = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
 	uint32_t dtr = 0;

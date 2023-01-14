@@ -1,16 +1,7 @@
 #define DT_DRV_COMPAT rohm_bh1750
 
-//#include <zephyr/device.h>
-//#include <zephyr/devicetree.h> 
-//#include <zephyr/kernel.h>
-//#include <zephyr/init.h>
-//#include <zephyr/drivers/sensor.h>
-//#include <zephyr/sys/__assert.h>
-//#include <zephyr/logging/log.h>
 #include <zephyr/drivers/i2c.h>
 #include "bh1750.h"
-
-//LOG_MODULE_REGISTER(BH1750, CONFIG_SENSOR_LOG_LEVEL);
 
 float measuringTimeFactor = 1;
 uint8_t i2c_buffer[2];
@@ -53,7 +44,7 @@ extern void dataRegReset(){
 
 
 extern void setMeasuringTime(){
-  uint8_t mt = measuringTimeFactor*69;
+  uint8_t mt = measuringTimeFactor*69; // implementirai nachin za promqna na measuring time factora i promqna na MTReg (napravi kconfig opciq)
   uint8_t highByteMT = ((mt>>5) | 0b01000000);
   uint8_t lowByteMT = (mt & 0b01111111);
   lowByteMT |= 0b01100000;
@@ -80,3 +71,11 @@ extern void writeBH1750(uint8_t val){
 }
 
 
+
+//#include <zephyr/device.h>
+//#include <zephyr/devicetree.h> 
+//#include <zephyr/kernel.h>
+//#include <zephyr/init.h>
+//#include <zephyr/drivers/sensor.h>
+//#include <zephyr/sys/__assert.h>
+//#include <zephyr/logging/log.h>

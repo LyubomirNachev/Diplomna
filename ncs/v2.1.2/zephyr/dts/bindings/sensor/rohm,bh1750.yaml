@@ -1,17 +1,11 @@
+# A high level description of the device the binding applies to:
 description: |
     Rohm BH1750 Ambient Light Sensor. See datasheet at
     https://www.mouser.com/datasheet/2/348/bh1750fvi-e-186247.pdf
 
+# Used to match nodes to this binding as discussed above:
 compatible: "rohm,bh1750"
 
+# You can include definitions from other bindings using this syntax:
 include: i2c-device.yaml
-
-#  properties:
-#     int-gpios:
-#       type: phandle-array
-#       required: false
-#       description: |
-#         The INT pin defaults to active low when produced by the sensor.
-#         The property value should ensure the flags properly describe the
-#         signal that is presented to the driver.
 
