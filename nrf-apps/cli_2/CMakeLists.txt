@@ -12,5 +12,3 @@ project(openthread_cli)
 # NORDIC SDK APP START
 target_sources(app PRIVATE src/main.c)
 # NORDIC SDK APP END
-
-target_sources_ifdef(CONFIG_BT app PRIVATE src/ble.c)

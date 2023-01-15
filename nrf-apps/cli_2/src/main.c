@@ -1,26 +1,16 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
-
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
-#include <zephyr/net/ieee802154.h>
-#include <zephyr/net/ieee802154_radio.h>
+//#include <nrf_802154.h>
+#include <openthread/thread.h>
 
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
-#define WELLCOME_TEXT \
-	"\n\r"\
-	"\n\r"\
-	"OpenThread Command Line Interface is now running.\n\r" \
-	"Use the 'ot' keyword to invoke OpenThread commands e.g. " \
-	"'ot thread start.'\n\r" \
-	"For the full commands list refer to the OpenThread CLI " \
-	"documentation at:\n\r" \
-	"https://github.com/openthread/openthread/blob/master/src/cli/README.md\n\r"
-
 void main(void)
 {
-#if DT_NODE_HAS_COMPAT(DT_CHOSEN(zephyr_shell_uart), zephyr_cdc_acm_uart)
+	//nrf_radio_txpower_set(NRF_RADIO_TXPOWER_POS8DBM, 8);
+	otPlatRadioSetTransmitPower(NULL, 8);
 	int ret;
 	const struct device *dev;
 	uint32_t dtr = 0U;
@@ -54,6 +44,4 @@ void main(void)
 	(void)uart_line_ctrl_set(dev, UART_LINE_CTRL_DCD, 1);
 	/* Data Set Ready - the NCP SoC is ready to communicate */
 	(void)uart_line_ctrl_set(dev, UART_LINE_CTRL_DSR, 1);
-#endif
-	LOG_INF(WELLCOME_TEXT);
 }

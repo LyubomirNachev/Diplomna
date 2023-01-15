@@ -4,22 +4,10 @@
 	hw-flow-control;
 };
 
-&zephyr_udc0 {
-	cdc_acm_uart0: cdc_acm_uart0 {
-		compatible = "zephyr,cdc-acm-uart";
-		label = "CDC_ACM_0";
-	};
-};
-
 / {
 	chosen {
 		zephyr,entropy = &rng;
 	};
 };
 
-/ {
-	chosen {
-		zephyr,shell-uart = &cdc_acm_uart0;
-	};
-};
 
