@@ -11,6 +11,9 @@
 !/Schematics/
 !Schematics/**
 
+!/3Dmodels/
+!3Dmodels/**
+
 !/Schematics_vodesht_vyzel/
 !Schematics_vodesht_vyzel/**
 
