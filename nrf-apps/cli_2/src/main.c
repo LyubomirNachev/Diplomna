@@ -2,14 +2,66 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
-//#include <nrf_802154.h>
 #include <openthread/thread.h>
+#include <net/openthread.h>
+#include <openthread/udp.h>
+#include <zephyr.h>
+#include <device.h>
+#include <devicetree.h>
+#include <drivers/gpio.h>
+#include <zephyr/sys/printk.h>
 
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
+#define BUTTON0_NODE DT_NODELABEL(button0)
+static const struct gpio_dt_spec button0_spec = GPIO_DT_SPEC_GET(BUTTON0_NODE, gpios);
+static struct gpio_callback button0_cb;
+
+static void udp_send(void){
+	otError			error = OT_ERROR_NONE;
+	const char *buf = "Hello Thread";
+
+	otInstance *myInstance;
+	myInstance = openthread_get_default_instance();
+	otUdpSocket mySocket;
+
+	otMessageInfo messageInfo;
+	memset(&messageInfo, 0, sizeof(messageInfo));
+	otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
+	messageInfo.mPeerPort = 2222;
+
+	do{
+		error = otUdpOpen(myInstance, &mySocket, NULL, NULL);
+		if (error != OT_ERROR_NONE){ break; }
+		otMessage *test_Message = otUdpNewMessage(myInstance, NULL);
+		error = otMessageAppend(test_Message, buf, (uint16_t)strlen(buf));
+		if (error != OT_ERROR_NONE){ break; }
+		error = otUdpSend(myInstance, &mySocket, test_Message, &messageInfo);
+		if (error != OT_ERROR_NONE){ break; }
+		error = otUdpClose(myInstance, &mySocket);
+	}while(false);
+	
+	if(error == OT_ERROR_NONE){
+		LOG_INF("Send.\n");
+	}else{
+		LOG_INF("udpSend error: %d\n", error);
+	}
+}
+
+void button_pressed_callback(const struct device *gpiob, struct gpio_callback *cb, gpio_port_pins_t pins){
+	udp_send();
+}
+
 void main(void)
 {
-	//nrf_radio_txpower_set(NRF_RADIO_TXPOWER_POS8DBM, 8);
+	gpio_pin_configure_dt(&button0_spec, GPIO_INPUT);
+	gpio_pin_interrupt_configure_dt(&button0_spec, GPIO_INT_EDGE_TO_ACTIVE);
+	gpio_init_callback(&button0_cb, button_pressed_callback, BIT(button0_spec.pin));
+	gpio_add_callback(button0_spec.port, &button0_cb);
+
+
+
+
 	otPlatRadioSetTransmitPower(NULL, 8);
 	int ret;
 	const struct device *dev;
@@ -45,3 +97,5 @@ void main(void)
 	/* Data Set Ready - the NCP SoC is ready to communicate */
 	(void)uart_line_ctrl_set(dev, UART_LINE_CTRL_DSR, 1);
 }
+
+
