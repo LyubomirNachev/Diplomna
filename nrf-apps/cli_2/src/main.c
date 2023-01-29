@@ -27,8 +27,8 @@ static void udp_send(void){
 
 	otMessageInfo messageInfo;
 	memset(&messageInfo, 0, sizeof(messageInfo));
-	otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
-	messageInfo.mPeerPort = 2222;
+	otIp6AddressFromString("ff02::1", &messageInfo.mPeerAddr);
+	messageInfo.mPeerPort = 49155;
 
 	do{
 		error = otUdpOpen(myInstance, &mySocket, NULL, NULL);

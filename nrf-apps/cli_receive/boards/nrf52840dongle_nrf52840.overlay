@@ -1,0 +1,13 @@
+
+&uart0 {
+	status = "okay";
+	hw-flow-control;
+};
+
+/ {
+	chosen {
+		zephyr,entropy = &rng;
+	};
+};
+
+
