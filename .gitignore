@@ -61,7 +61,7 @@
 !ncs/v2.1.2/zephyr/boards/arm
 !ncs/v2.1.2/zephyr/boards/arm/nrf52840dongle_nrf52840
 !ncs/v2.1.2/zephyr/boards/arm/nrf52840dongle_nrf52840/nrf52840dongle_nrf52840-pinctrl.dtsi
-
+!ncs/v2.1.2/zephyr/boards/arm/nrf52840dongle_nrf52840/nrf52840dongle_nrf52840.dts
 #ncs/*
 #!ncs/v2.1.2
 
