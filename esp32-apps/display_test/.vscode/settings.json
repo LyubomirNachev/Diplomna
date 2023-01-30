@@ -1,0 +1,15 @@
+{
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "idf.adapterTargetName": "esp32",
+    "idf.customExtraVars": "{}",
+    "idf.espIdfPathWin": "c:\\Diplomna\\esp-idf",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32.cfg"
+    ],
+    "idf.portWin": "COM3",
+    "idf.pythonBinPathWin": "C:\\Users\\lubol\\.espressif\\python_env\\idf5.0_py3.8_env\\Scripts\\python.exe",
+    "idf.toolsPathWin": "C:\\Users\\lubol\\.espressif",
+    "nrf-connect.topdir": "${nrf-connect.sdk:2.1.2}",
+    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}"
+}
