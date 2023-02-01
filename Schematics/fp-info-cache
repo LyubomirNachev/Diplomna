@@ -1,4 +1,4 @@
-20603507838028455
+20605184462557019
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -86461,8 +86461,8 @@ BHC-18650-1P
 
 
 0
-2
-2
+3
+3
 custom
 BME688
 
@@ -86498,6 +86498,13 @@ NODEMCU32S
 0
 38
 38
+custom
+Slot
+
+
+0
+0
+0
 custom
 TP4056
 

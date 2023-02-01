@@ -1,0 +1,18 @@
+(footprint "Slot" (version 20211014) (generator pcbnew)
+  (layer "F.Cu")
+  (tedit 0)
+  (attr through_hole)
+  (fp_text reference "REF**" (at 0.5 -5 unlocked) (layer "F.SilkS") hide
+    (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp f0620a78-8a26-4dd3-bc8d-776dfb9efbbc)
+  )
+  (fp_text value "Slot" (at 0 4.5 unlocked) (layer "F.Fab") hide
+    (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp a04bd4e8-41bf-4053-beae-b1148283290d)
+  )
+  (fp_text user "${REFERENCE}" (at 0 5 unlocked) (layer "F.Fab")
+    (effects (font (size 1 1) (thickness 0.15)))
+    (tstamp 0d377b8e-8efa-474c-b175-7a995a1872a8)
+  )
+  (pad "" np_thru_hole oval (at 0 0) (size 3 7) (drill oval 3 7) (layers F&B.Cu *.Mask) (tstamp 7e4885a4-1654-44d2-aa91-57a5b95c6f86))
+)
