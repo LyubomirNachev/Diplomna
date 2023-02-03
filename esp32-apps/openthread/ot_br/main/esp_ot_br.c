@@ -55,6 +55,15 @@
 #include "openthread/tasklet.h"
 #include "openthread/thread_ftd.h"
 
+#include <openthread/message.h>
+#include <openthread/udp.h>
+#include "openthread/thread.h"
+#include <openthread/instance.h>
+
+// #define UDP_PORT 1234
+// #define MAX_LEN 1024
+
+
 #define TAG "esp_ot_br"
 
 #if CONFIG_OPENTHREAD_BR_AUTO_START
@@ -198,6 +207,46 @@ static void ot_task_worker(void *aContext)
     vTaskDelete(NULL);
 }
 
+
+// static void initUdp(otInstance *aInstance);
+// static otUdpSocket sUdpSocket;
+
+// void handle_received_data(void *context, otMessage *message, const otMessageInfo *message_info)
+// {
+//     OT_UNUSED_VARIABLE(context);
+//     OT_UNUSED_VARIABLE(message);
+//     OT_UNUSED_VARIABLE(message_info);
+//     otError error = OT_ERROR_NONE;
+//     uint16_t data_length = otMessageGetLength(message);
+//     char buffer[MAX_LEN];
+
+//     if (data_length > MAX_LEN - 1) {
+//         data_length = MAX_LEN - 1;
+//     }
+
+//     error = otMessageRead(message, 0, buffer, data_length);
+//     if (error != OT_ERROR_NONE) {
+//         printf("Failed to read message data, error: %d", error);
+//         return;
+//     }
+
+//     buffer[data_length] = '\0';
+//     printf("Data: %s", buffer);
+// }
+
+// void initUdp(otInstance *aInstance)
+// {
+//     otSockAddr  listenSockAddr;
+
+//     memset(&sUdpSocket, 0, sizeof(sUdpSocket));
+//     memset(&listenSockAddr, 0, sizeof(listenSockAddr));
+
+//     listenSockAddr.mPort    = UDP_PORT;
+
+//     otUdpOpen(aInstance, &sUdpSocket, handle_received_data, aInstance);
+//     otUdpBind(aInstance, &sUdpSocket, &listenSockAddr, OT_NETIF_THREAD);
+// }
+
 void app_main(void)
 {
     // Used eventfds:
@@ -217,6 +266,7 @@ void app_main(void)
     ESP_ERROR_CHECK(example_connect());
     ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
     esp_openthread_set_backbone_netif(get_example_netif());
+    //initUdp(esp_openthread_get_instance());
 #else
     esp_ot_wifi_netif_init();
     esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
@@ -224,4 +274,6 @@ void app_main(void)
     ESP_ERROR_CHECK(mdns_init());
     ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
     xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL);
+
+    
 }
