@@ -55,14 +55,18 @@
 #include "openthread/tasklet.h"
 #include "openthread/thread_ftd.h"
 
-#include <openthread/message.h>
-#include <openthread/udp.h>
-#include "openthread/thread.h"
-#include <openthread/instance.h>
+#include "esp_ot_udp_socket.h"
 
-// #define UDP_PORT 1234
-// #define MAX_LEN 1024
-
+#include "esp_check.h"
+#include "esp_err.h"
+#include "esp_log.h"
+#include "esp_netif.h"
+#include "esp_openthread_lock.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "lwip/err.h"
+#include "lwip/mld6.h"
+#include "lwip/sockets.h"
 
 #define TAG "esp_ot_br"
 
@@ -207,45 +211,68 @@ static void ot_task_worker(void *aContext)
     vTaskDelete(NULL);
 }
 
+static void udp_socket_server_task(void *pvParameters)
+{
+    char addr_str[128];
+    char *payload = "This message is from server\n";
+    char rx_buffer[128];
+    esp_err_t ret = ESP_OK;
+    int err = 0;
+    int len;
+    int listen_sock;
 
-// static void initUdp(otInstance *aInstance);
-// static otUdpSocket sUdpSocket;
+    int port = CONFIG_OPENTHREAD_CLI_UDP_SERVER_PORT;
+    struct timeval timeout = {0};
+    struct sockaddr_storage source_addr; // Large enough for both IPv4 or IPv6
+    struct sockaddr_in6 listen_addr;
 
-// void handle_received_data(void *context, otMessage *message, const otMessageInfo *message_info)
-// {
-//     OT_UNUSED_VARIABLE(context);
-//     OT_UNUSED_VARIABLE(message);
-//     OT_UNUSED_VARIABLE(message_info);
-//     otError error = OT_ERROR_NONE;
-//     uint16_t data_length = otMessageGetLength(message);
-//     char buffer[MAX_LEN];
+    inet6_aton("::", &listen_addr.sin6_addr);
+    listen_addr.sin6_family = AF_INET6;
+    listen_addr.sin6_port = htons(port);
 
-//     if (data_length > MAX_LEN - 1) {
-//         data_length = MAX_LEN - 1;
-//     }
+    listen_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+    ESP_GOTO_ON_FALSE((listen_sock >= 0), ESP_OK, exit, TAG, "Unable to create socket: errno %d", errno);
+    ESP_LOGI(TAG, "Socket created");
 
-//     error = otMessageRead(message, 0, buffer, data_length);
-//     if (error != OT_ERROR_NONE) {
-//         printf("Failed to read message data, error: %d", error);
-//         return;
-//     }
+    // Note that by default IPV6 binds to both protocols, it is must be disabled
+    // if both protocols used at the same time (used in CI)
+    int opt = 1;
+    setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    setsockopt(listen_sock, IPPROTO_IPV6, IPV6_V6ONLY, &opt, sizeof(opt));
 
-//     buffer[data_length] = '\0';
-//     printf("Data: %s", buffer);
-// }
+    err = bind(listen_sock, (struct sockaddr *)&listen_addr, sizeof(listen_addr));
+    ESP_GOTO_ON_FALSE((err == 0), ESP_FAIL, exit, TAG, "Socket unable to bind: errno %d", errno);
+    ESP_LOGI(TAG, "Socket bound, port %d", port);
+while(1){
+    timeout.tv_sec = 0;
+    setsockopt(listen_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
-// void initUdp(otInstance *aInstance)
-// {
-//     otSockAddr  listenSockAddr;
+    ESP_LOGI(TAG, "Waiting for data, no timeout");
+    socklen_t socklen = sizeof(source_addr);
+    len = recvfrom(listen_sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *)&source_addr, &socklen);
 
-//     memset(&sUdpSocket, 0, sizeof(sUdpSocket));
-//     memset(&listenSockAddr, 0, sizeof(listenSockAddr));
+    // Error occurred during receiving
+    ESP_GOTO_ON_FALSE((len >= 0), ESP_FAIL, exit, TAG, "recvfrom failed: errno %d", errno);
+    // Data received
+    // Get the sender's ip address as string
+    inet6_ntoa_r(((struct sockaddr_in6 *)&source_addr)->sin6_addr, addr_str, sizeof(addr_str) - 1);
 
-//     listenSockAddr.mPort    = UDP_PORT;
+    rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string...
+    ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
+    ESP_LOGI(TAG, "%s", rx_buffer);
 
-//     otUdpOpen(aInstance, &sUdpSocket, handle_received_data, aInstance);
-//     otUdpBind(aInstance, &sUdpSocket, &listenSockAddr, OT_NETIF_THREAD);
-// }
+    err = sendto(listen_sock, payload, strlen(payload), 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
+    ESP_GOTO_ON_FALSE((err >= 0), ESP_FAIL, exit, TAG, "Error occurred during sending: errno %d", errno);
+}
+exit:
+    if (ret != ESP_OK) {
+        shutdown(listen_sock, 0);
+        close(listen_sock);
+    }
+    ESP_LOGI(TAG, "Socket server is closed.");
+    vTaskDelete(NULL);
+}
+
 
 void app_main(void)
 {
@@ -262,18 +289,19 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-#if CONFIG_OPENTHREAD_BR_AUTO_START
-    ESP_ERROR_CHECK(example_connect());
-    ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
-    esp_openthread_set_backbone_netif(get_example_netif());
-    //initUdp(esp_openthread_get_instance());
-#else
-    esp_ot_wifi_netif_init();
-    esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
-#endif // CONFIG_OPENTHREAD_BR_AUTO_START
-    ESP_ERROR_CHECK(mdns_init());
-    ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
-    xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL);
-
-    
+    #if CONFIG_OPENTHREAD_BR_AUTO_START
+        ESP_ERROR_CHECK(example_connect());
+        ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
+        esp_openthread_set_backbone_netif(get_example_netif());
+    #else
+        esp_ot_wifi_netif_init();
+        esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
+    #endif // CONFIG_OPENTHREAD_BR_AUTO_START
+        ESP_ERROR_CHECK(mdns_init());
+        ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
+        xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL);
+        xTaskCreate(udp_socket_server_task, "ot_udp_scoket_server", 4096, xTaskGetCurrentTaskHandle(), 4, NULL);
 }
+
+
+

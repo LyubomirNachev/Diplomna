@@ -11,5 +11,8 @@
     "idf.pythonBinPathWin": "C:\\Users\\lubol\\.espressif\\python_env\\idf5.0_py3.8_env\\Scripts\\python.exe",
     "idf.toolsPathWin": "C:\\Users\\lubol\\.espressif",
     "nrf-connect.topdir": "${nrf-connect.sdk:2.1.2}",
-    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}"
+    "nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}",
+    "nrf-connect.applications": [
+        "c:\\Diplomna\\nrf-apps\\battery_adc_charge"
+    ]
 }
