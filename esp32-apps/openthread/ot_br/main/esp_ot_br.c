@@ -1,19 +1,5 @@
-/*
- * SPDX-FileCopyrightText: 2021-2022 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: CC0-1.0
- *
- * OpenThread Border Router Example
- *
- * This example code is in the Public Domain (or CC0 licensed, at your option.)
- *
- * Unless required by applicable law or agreed to in writing, this
- * software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- * CONDITIONS OF ANY KIND, either express or implied.
- */
-
 #include <stdio.h>
-#include <stdlib.h> //
+#include <stdlib.h>
 #include <string.h>
 
 #include "esp_check.h"
@@ -57,7 +43,6 @@
 #include "openthread/thread_ftd.h"
 
 #include "esp_ot_udp_socket.h"
-
 #include "lwip/err.h"
 #include "lwip/mld6.h"
 #include "lwip/sockets.h"
@@ -218,6 +203,8 @@ static void ot_task_worker(void *aContext)
     vTaskDelete(NULL);
 }
 
+//UDP Socket function
+
 char rx_buffer[128];
 int len;
 
@@ -282,17 +269,7 @@ exit:
     vTaskDelete(NULL);
 }
 
-
-
-
-
-
-
-
-
-
-
-
+//Web page functions
 
 esp_err_t send_web_page(httpd_req_t *req)
 {
@@ -354,29 +331,6 @@ httpd_handle_t setup_server(void)
     return server;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void app_main(void)
 {
     // Used eventfds:
@@ -402,22 +356,21 @@ void app_main(void)
     #endif // CONFIG_OPENTHREAD_BR_AUTO_START
         ESP_ERROR_CHECK(mdns_init());
         ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
+        //OT_BR_INIT
         xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL);
+        //Udp init
         xTaskCreate(udp_socket_server_task, "ot_udp_scoket_server", 4096, xTaskGetCurrentTaskHandle(), 4, NULL);
+        //Web Page init
+        esp_err_t ret = nvs_flash_init();
+        if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+        {
+            ESP_ERROR_CHECK(nvs_flash_erase());
+            ret = nvs_flash_init();
+        }
+        ESP_ERROR_CHECK(ret);
 
-
-
-
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
-
-    ESP_LOGI(TAG, "Web Server is running ... ...\n");
-    setup_server();
+        ESP_LOGI(TAG, "Web Server is running ... ...\n");
+        setup_server();
 }
 
 
