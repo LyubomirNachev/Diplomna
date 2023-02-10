@@ -1,8 +1,3 @@
-/*
- * Copyright (c) 2019 Nordic Semiconductor ASA
- *
- * SPDX-License-Identifier: Apache-2.0
- */
 
 &i2c0 {
 	bh1750@23 {

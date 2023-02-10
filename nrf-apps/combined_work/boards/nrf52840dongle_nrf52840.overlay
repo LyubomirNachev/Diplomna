@@ -1,0 +1,23 @@
+
+
+
+&i2c0 {
+	bh1750@23 {
+		compatible = "rohm,bh1750";
+		reg = <0x23>;
+		status = "okay";
+	};
+};
+
+&uart0 {
+	status = "okay";
+	hw-flow-control;
+};
+
+/ {
+	chosen {
+		zephyr,entropy = &rng;
+	};
+};
+
+

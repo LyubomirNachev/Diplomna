@@ -25,7 +25,7 @@ void main(void){
 	powerOn();
     setMeasuringTime(); 
 	while(1){
-		getLux();
+		printk("Light: %d lx \n", getLux());
 		k_sleep(K_MSEC(100));
 	}
 }

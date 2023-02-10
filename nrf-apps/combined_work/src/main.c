@@ -11,6 +11,14 @@
 #include <drivers/gpio.h>
 #include <zephyr/sys/printk.h>
 
+#include <zephyr/zephyr.h>
+#include <zephyr/device.h>
+#include <zephyr/drivers/sensor.h>
+#include <stdio.h>
+#include <zephyr/sys/util.h>
+#include <zephyr/drivers/i2c.h>
+
+
 
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
@@ -18,10 +26,11 @@ LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 static const struct gpio_dt_spec button0_spec = GPIO_DT_SPEC_GET(BUTTON0_NODE, gpios);
 static struct gpio_callback button0_cb;
 
-static void udp_send(void){
+static void udp_send(int val1){
 	otError			error = OT_ERROR_NONE;
-	const char *buf = "Hello Thread";
-
+	char data[30];
+	sprintf(data, "%d", val1);
+	char *buf = &data;
 	otInstance *myInstance;
 	myInstance = openthread_get_default_instance();
 	otUdpSocket mySocket;
@@ -43,18 +52,22 @@ static void udp_send(void){
 	}while(false);
 	
 	if(error == OT_ERROR_NONE){
-		LOG_INF("Send.\n");
+		LOG_INF("Send. %s\n", buf);
 	}else{
 		LOG_INF("udpSend error: %d\n", error);
 	}
 }
 
 void button_pressed_callback(const struct device *gpiob, struct gpio_callback *cb, gpio_port_pins_t pins){
-	udp_send();
+	
 }
+
 
 void main(void)
 {
+	powerOn();
+    setMeasuringTime(); 
+
 	gpio_pin_configure_dt(&button0_spec, GPIO_INPUT);
 	gpio_pin_interrupt_configure_dt(&button0_spec, GPIO_INT_EDGE_TO_ACTIVE);
 	gpio_init_callback(&button0_cb, button_pressed_callback, BIT(button0_spec.pin));
@@ -89,6 +102,10 @@ void main(void)
 			continue;
 		}
 		k_msleep(100);
+	}
+	while(1){
+		udp_send(getLux());
+		k_sleep(K_MSEC(100));
 	}
 
 	/* Data Carrier Detect Modem - mark connection as established */
