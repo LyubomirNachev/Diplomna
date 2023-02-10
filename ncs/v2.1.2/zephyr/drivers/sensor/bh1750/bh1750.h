@@ -26,7 +26,7 @@
     #define BH1750_MODE 0b00100011 
 #endif
 
-extern void getLux();
+extern int getLux();
 extern void powerDown();
 extern void powerOn();
 extern void dataRegReset();

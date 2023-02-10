@@ -44,13 +44,13 @@
 		};
 	};
 
-	vbatt {
-		compatible = "voltage-divider";
-		io-channels = <&adc 4>;
-		output-ohms = <100000>;
-		full-ohms = <(1000000 + 100000)>;
-		power-gpios = <&gpio0 0 2>;
-	};
+	// vbatt {
+	// 	compatible = "voltage-divider";
+	// 	io-channels = <&adc 4>;
+	// 	output-ohms = <100000>;
+	// 	full-ohms = <(1000000 + 100000)>;
+	// 	power-gpios = <&gpio0 0 2>;
+	// };
 
 
 	pwmleds {

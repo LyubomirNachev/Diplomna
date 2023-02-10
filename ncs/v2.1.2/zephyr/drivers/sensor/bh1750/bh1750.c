@@ -8,10 +8,10 @@ uint8_t i2c_buffer[2];
 static const struct device *dev = DEVICE_DT_GET(I2C_NODE);
 int err;
 
-extern void getLux(){
+extern int getLux(){
   if (!device_is_ready(dev)){
     printk("device is not ready\n");
-    return;
+    return 0;
   }
 	uint16_t raw_lux;
 	float lux;
@@ -19,9 +19,9 @@ extern void getLux(){
 	if((BH1750_MODE == 0b00010001)||(BH1750_MODE == 0b00100001)){
 		lux = (raw_lux/2.4)/measuringTimeFactor;
 	}else{
-		lux = (raw_lux/1.2)/measuringTimeFactor;
+	  lux = (raw_lux/1.2)/measuringTimeFactor;
 	}
-	printk("Light: %f lx \n", lux);
+  return (int)lux;
 }
 
 extern void powerDown(){
@@ -54,28 +54,20 @@ extern void setMeasuringTime(){
 
 extern uint16_t readBH1750(){
   err = i2c_read(dev, i2c_buffer, 2, BH1750_ADDRESS_1);
-  if (err < 0){
-    printk("Read Failed: %d\n", err);
-  }
+  // if (err < 0){
+  //   printk("Read Failed: %d\n", err);
+  // }
   return ((i2c_buffer[0]<<8) + i2c_buffer[1]);
 }
 
 
 extern void writeBH1750(uint8_t val){
   i2c_buffer[0] = val;
-  printk("value: %d\n", i2c_buffer[0]);
+  // printk("value: %d\n", i2c_buffer[0]);
     err = i2c_write(dev, i2c_buffer, 1, BH1750_ADDRESS_1);
-    if (err < 0){
-      printk("Write Failed: %d\n", err);
-    }
+    // if (err < 0){
+    //   printk("Write Failed: %d\n", err);
+    // }
 }
 
 
-
-//#include <zephyr/device.h>
-//#include <zephyr/devicetree.h> 
-//#include <zephyr/kernel.h>
-//#include <zephyr/init.h>
-//#include <zephyr/drivers/sensor.h>
-//#include <zephyr/sys/__assert.h>
-//#include <zephyr/logging/log.h>
