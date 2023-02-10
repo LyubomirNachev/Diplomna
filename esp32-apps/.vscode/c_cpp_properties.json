@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Diplomna/esp-idf/**",
+                "C:/Diplomna/esp-idf/components/freertos/FreeRTOS-Kernel-SMP/include",
+                "C:/Diplomna/esp-idf/components/freertos/FreeRTOS-Kernel-SMP/include",
+                "C:/Diplomna/esp-idf/components/freertos/FreeRTOS-Kernel/include",
+                "C:/Diplomna/esp-idf/components/esp_system/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "windows-msvc-x64",
+            "configurationProvider": "nrf-connect"
+        }
+    ],
+    "version": 4
+}

@@ -62,6 +62,26 @@ char off_resp[] = "<!DOCTYPE html><html><head><style>body {background-color: rgb
 
 #define TAG "esp_ot_br"
 
+
+
+//
+#include <esp_wifi.h>
+#include <esp_event.h>
+#include <esp_log.h>
+#include <esp_system.h>
+#include <nvs_flash.h>
+#include <sys/param.h>
+#include "esp_netif.h"
+#include "esp_eth.h"
+#include "protocol_examples_common.h"
+
+#include <esp_http_server.h>
+//
+
+
+
+
+
 #if CONFIG_OPENTHREAD_BR_AUTO_START
 static int hex_digit_to_int(char hex)
 {
@@ -271,65 +291,122 @@ exit:
 
 //Web page functions
 
-esp_err_t send_web_page(httpd_req_t *req)
+// esp_err_t send_web_page(httpd_req_t *req)
+// {
+//     int response;
+//     if (len == 12){
+//         response = httpd_resp_send(req, off_resp, HTTPD_RESP_USE_STRLEN);
+//         len = 0;
+//     }
+//     else{
+//         response = httpd_resp_send(req, on_resp, HTTPD_RESP_USE_STRLEN);
+//     }
+//     return response;
+// }
+// esp_err_t get_req_handler(httpd_req_t *req)
+// {
+//     return send_web_page(req);
+// }
+
+// esp_err_t messg_rcv_handler(httpd_req_t *req)
+// {
+//     return send_web_page(req);
+// }
+
+// esp_err_t messg_no_rcv_handler(httpd_req_t *req)
+// {
+//     return send_web_page(req);
+// }
+
+// httpd_uri_t uri_get = {
+//     .uri = "/",
+//     .method = HTTP_GET,
+//     .handler = get_req_handler,
+//     .user_ctx = NULL};
+
+// httpd_uri_t uri_on = {
+//     .uri = "/Received",
+//     .method = HTTP_GET,
+//     .handler = messg_rcv_handler,
+//     .user_ctx = NULL};
+
+// httpd_uri_t uri_off = {
+//     .uri = "/Oh_oh",
+//     .method = HTTP_GET,
+//     .handler =messg_no_rcv_handler,
+//     .user_ctx = NULL};
+
+// httpd_handle_t setup_server(void)
+// {
+//     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+//     httpd_handle_t server = NULL;
+
+//     if (httpd_start(&server, &config) == ESP_OK)
+//     {
+//         httpd_register_uri_handler(server, &uri_get);
+//         httpd_register_uri_handler(server, &uri_on);
+//         httpd_register_uri_handler(server, &uri_off);
+//     }
+
+//     return server;
+// }
+
+struct async_resp_arg {
+    httpd_handle_t hd;
+    int fd;
+};
+
+/*
+ * async send function, which we put into the httpd work queue
+ */
+static void ws_async_resp(void *arg)
 {
-    int response;
-    if (len == 12){
-        response = httpd_resp_send(req, off_resp, HTTPD_RESP_USE_STRLEN);
-        len = 0;
-    }
-    else{
-        response = httpd_resp_send(req, on_resp, HTTPD_RESP_USE_STRLEN);
-    }
-    return response;
+    char http_str[250];
+    char *data_str = "Hello from ESP32 websocket server ...";
+    sprintf(http_str, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", strlen(data_str));
+    struct async_resp_arg *resp_arg = (struct async_resp_arg *)arg;
+    httpd_handle_t hd = resp_arg->hd;
+    int fd = resp_arg->fd;
+    ESP_LOGI(TAG, "Executing queued work fd: %d", fd);
+    httpd_socket_send(hd, fd, http_str, strlen(http_str), 0);
+    httpd_socket_send(hd, fd, data_str, strlen(data_str), 0);
+
+    // httpd_ws_frame_t ws_pkt;
+    // memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    // ws_pkt.payload = (uint8_t*)data;
+    // ws_pkt.len = strlen(data);
+    // ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+    // httpd_ws_send_frame_async(hd, fd, &ws_pkt);
+    free(arg);
 }
-esp_err_t get_req_handler(httpd_req_t *req)
+static esp_err_t async_get_handler(httpd_req_t *req)
 {
-    return send_web_page(req);
+    struct async_resp_arg *resp_arg = malloc(sizeof(struct async_resp_arg));
+    resp_arg->hd = req->handle;
+    resp_arg->fd = httpd_req_to_sockfd(req);
+    httpd_queue_work(req->handle, ws_async_resp, resp_arg);
+    return ESP_OK;
 }
 
-esp_err_t messg_rcv_handler(httpd_req_t *req)
+static const httpd_uri_t ws = {
+        .uri        = "/ws",
+        .method     = HTTP_GET,
+        .handler    = async_get_handler,
+        .user_ctx   = NULL,
+        .is_websocket = true
+};
+
+static void start_webserver(void)
 {
-    return send_web_page(req);
-}
-
-esp_err_t messg_no_rcv_handler(httpd_req_t *req)
-{
-    return send_web_page(req);
-}
-
-httpd_uri_t uri_get = {
-    .uri = "/",
-    .method = HTTP_GET,
-    .handler = get_req_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t uri_on = {
-    .uri = "/Received",
-    .method = HTTP_GET,
-    .handler = messg_rcv_handler,
-    .user_ctx = NULL};
-
-httpd_uri_t uri_off = {
-    .uri = "/Oh_oh",
-    .method = HTTP_GET,
-    .handler =messg_no_rcv_handler,
-    .user_ctx = NULL};
-
-httpd_handle_t setup_server(void)
-{
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
     httpd_handle_t server = NULL;
-
-    if (httpd_start(&server, &config) == ESP_OK)
-    {
-        httpd_register_uri_handler(server, &uri_get);
-        httpd_register_uri_handler(server, &uri_on);
-        httpd_register_uri_handler(server, &uri_off);
-    }
-
-    return server;
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    ESP_LOGI(TAG, "Starting server on port: '%d'", config.server_port);
+    httpd_start(&server, &config);
+    httpd_register_uri_handler(server, &ws);
 }
+
+
+
 
 void app_main(void)
 {
@@ -369,8 +446,8 @@ void app_main(void)
         }
         ESP_ERROR_CHECK(ret);
 
-        ESP_LOGI(TAG, "Web Server is running ... ...\n");
-        setup_server();
+        ESP_LOGI(TAG, "Socket is running ... ...\n");
+        start_webserver();
 }
 
 
