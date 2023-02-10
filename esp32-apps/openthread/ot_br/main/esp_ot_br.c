@@ -362,7 +362,7 @@ struct async_resp_arg {
 static void ws_async_resp(void *arg)
 {
     char http_str[250];
-    char *data_str = "Hello from ESP32 websocket server ...";
+    char *data_str = &rx_buffer;
     sprintf(http_str, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", strlen(data_str));
     struct async_resp_arg *resp_arg = (struct async_resp_arg *)arg;
     httpd_handle_t hd = resp_arg->hd;
