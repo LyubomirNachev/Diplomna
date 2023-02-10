@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <zephyr/sys/util.h>
 #include <zephyr/drivers/i2c.h>
+#include <inttypes.h>
+
 
 
 
@@ -25,6 +27,7 @@ LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 #define BUTTON0_NODE DT_NODELABEL(button0)
 static const struct gpio_dt_spec button0_spec = GPIO_DT_SPEC_GET(BUTTON0_NODE, gpios);
 static struct gpio_callback button0_cb;
+
 
 static void udp_send(int val1){
 	otError			error = OT_ERROR_NONE;
@@ -61,7 +64,7 @@ static void udp_send(int val1){
 void button_pressed_callback(const struct device *gpiob, struct gpio_callback *cb, gpio_port_pins_t pins){
 	
 }
-
+#define I2C_NODE                 DT_NODELABEL(i2c1) 
 
 void main(void)
 {
@@ -90,7 +93,6 @@ void main(void)
 		LOG_ERR("Failed to find specific UART device");
 		return;
 	}
-
 	LOG_INF("Waiting for host to be ready to communicate");
 
 	/* Data Terminal Ready - check if host is ready to communicate */
@@ -103,10 +105,29 @@ void main(void)
 		}
 		k_msleep(100);
 	}
+	static const struct device *dev_bme = DEVICE_DT_GET(I2C_NODE);
+	struct sensor_value temp, press, humidity, gas_res;
+
+
 	while(1){
+		sensor_sample_fetch(dev_bme);
+		sensor_channel_get(dev_bme, SENSOR_CHAN_AMBIENT_TEMP, &temp);
+		sensor_channel_get(dev_bme, SENSOR_CHAN_PRESS, &press);
+		sensor_channel_get(dev_bme, SENSOR_CHAN_HUMIDITY, &humidity);
+		sensor_channel_get(dev_bme, SENSOR_CHAN_GAS_RES, &gas_res);
+
+		LOG_INF("T: %d.%06d; P: %d.%06d; H: %d.%06d; G: %d.%06d\n",
+				temp.val1, temp.val2, press.val1, press.val2,
+				humidity.val1, humidity.val2, gas_res.val1,
+				gas_res.val2);
 		udp_send(getLux());
 		k_sleep(K_MSEC(100));
 	}
+
+
+
+
+
 
 	/* Data Carrier Detect Modem - mark connection as established */
 	(void)uart_line_ctrl_set(dev, UART_LINE_CTRL_DCD, 1);

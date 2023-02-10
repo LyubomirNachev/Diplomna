@@ -17,3 +17,9 @@ tests:
     harness: console
     harness_config:
       fixture: fixture_usb_cdc
+  sample.sensor.bme680:
+    harness: sensor
+    tags: samples sensor
+    integration_platforms:
+      - nrf52840dongle_nrf52840
+    platform_allow: nrf52840dongle_nrf52840

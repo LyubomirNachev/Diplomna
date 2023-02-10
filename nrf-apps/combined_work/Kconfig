@@ -11,3 +11,15 @@ endmenu
 module = OT_COMMAND_LINE_INTERFACE
 module-str = ot_cli
 source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
+# config LOG
+# 	default y
+
+# config LOG_PRINTK
+# 	default y
+
+# config SENSOR_LOG_LEVEL
+# 	default 4
+
+# config I2C
+# 	default y

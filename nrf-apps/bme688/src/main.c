@@ -32,6 +32,9 @@ static const struct device *get_bme688_device(void)
 	return dev;
 }
 
+#define ID DT_NODELABEL(bme680)
+//DT_PROP(DT_CHILD(ID, bme680_76), status)
+
 void main(void){
     struct sensor_value temp, press, humidity, gas_res;
     const struct device *dev_console = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
@@ -48,7 +51,7 @@ void main(void){
 		k_sleep(K_MSEC(100));
 	}
 
-    const struct device *dev = get_bme688_device();
+    static const struct device *dev =  DEVICE_DT_GET(DT_PROP(DT_CHILD(ID, bme680_76)));
     if (dev == NULL) {
             printk("Eroorasdfsd");
 		    return;
