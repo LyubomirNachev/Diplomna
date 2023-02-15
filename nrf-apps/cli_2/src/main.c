@@ -2,9 +2,13 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/uart.h>
 #include <zephyr/usb/usb_device.h>
+
+
 #include <openthread/thread.h>
 #include <net/openthread.h>
+
 #include <openthread/udp.h>
+
 #include <zephyr.h>
 #include <device.h>
 #include <devicetree.h>
@@ -12,7 +16,7 @@
 #include <zephyr/sys/printk.h>
 
 
-LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
+// LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
 #define BUTTON0_NODE DT_NODELABEL(button0)
 static const struct gpio_dt_spec button0_spec = GPIO_DT_SPEC_GET(BUTTON0_NODE, gpios);

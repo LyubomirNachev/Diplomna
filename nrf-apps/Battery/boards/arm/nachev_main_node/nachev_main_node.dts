@@ -85,6 +85,7 @@
 		mcuboot-button0 = &button0;
 		mcuboot-led0 = &led0_green;
 		watchdog0 = &wdt0;
+		adcctrl = &adc;
 	};
 };
 
@@ -92,6 +93,7 @@
 &adc {
 	status = "okay";
 };
+
 
 &gpiote {
 	status = "okay";
@@ -121,18 +123,18 @@
 	pinctrl-1 = <&i2c0_sleep>;
 	pinctrl-names = "default", "sleep";
 	
-	bh1750_sensor: bh1750@23 {
-		compatible = "rohm,bh1750";
-		reg = <0x23>;
-		status = "okay";
-		label = "BH1750";
-	};
-	bme688_sensor: bme688@76 {
-		compatible = "bosch,bme688";
-		reg = <0x76>;
-		status = "okay";
-		label = "BME688";
-	};
+	// bh1750_sensor: bh1750@23 {
+	// 	compatible = "rohm,bh1750";
+	// 	reg = <0x23>;
+	// 	status = "okay";
+	// 	label = "BH1750";
+	// };
+	// bme680_sensor: bme680@76 {
+	// 	compatible = "bosch,bme680";
+	// 	reg = <0x76>;
+	// 	status = "okay";
+	// 	label = "BME680";
+	// };
 };
 
 &i2c1 {

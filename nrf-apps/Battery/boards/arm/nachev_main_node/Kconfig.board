@@ -1,0 +1,8 @@
+# nRF52840 Dongle NRF52840 board configuration
+
+# Copyright (c) 2018 Nordic Semiconductor ASA
+# SPDX-License-Identifier: Apache-2.0
+
+config BOARD_NACHEV_MAIN_NODE
+	bool "Nachev main node"
+	depends on SOC_NRF52840_QIAA

@@ -37,7 +37,7 @@ static void udp_send(int val1){
 
 	otMessageInfo messageInfo;
 	memset(&messageInfo, 0, sizeof(messageInfo));
-	otIp6AddressFromString("ff02::1", &messageInfo.mPeerAddr);
+	otIp6AddressFromString("ff03::1", &messageInfo.mPeerAddr);
 	messageInfo.mPeerPort = 12346;
 
 	do{
@@ -101,9 +101,8 @@ void main(void)
 		}
 		k_msleep(100);
 	}
-	//const char *bme680_label =  /* TODO: insert device name from user */;
-	//const struct device *dev_bme = device_get_binding(bme680_label);
-	const struct device *const dev_bme = DEVICE_DT_GET(DT_NODELABEL(bme680_sensor));
+
+	const struct device *const dev_bme = DEVICE_DT_GET(DT_NODELABEL(bme688_sensor));
 	struct sensor_value temp, press, humidity, gas_res;
 
 
@@ -119,7 +118,7 @@ void main(void)
 				humidity.val1, humidity.val2, gas_res.val1,
 				gas_res.val2);
 		udp_send(getLux());
-		k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(1000));
 	}
 
 

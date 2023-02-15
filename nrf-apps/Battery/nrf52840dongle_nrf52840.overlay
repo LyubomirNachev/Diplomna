@@ -1,0 +1,9 @@
+/
+&adc { /* ADC */
+    status = "okay";
+   };
+{
+aliases {
+    adcctrl = &adc;
+ };
+};
