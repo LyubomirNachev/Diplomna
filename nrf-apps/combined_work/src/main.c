@@ -19,9 +19,6 @@
 #include <zephyr/drivers/i2c.h>
 #include <inttypes.h>
 
-
-
-
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
 #define BUTTON0_NODE DT_NODELABEL(button0)
@@ -64,7 +61,6 @@ static void udp_send(int val1){
 void button_pressed_callback(const struct device *gpiob, struct gpio_callback *cb, gpio_port_pins_t pins){
 	
 }
-#define I2C_NODE                 DT_NODELABEL(i2c1) 
 
 void main(void)
 {
@@ -105,7 +101,9 @@ void main(void)
 		}
 		k_msleep(100);
 	}
-	static const struct device *dev_bme = DEVICE_DT_GET(I2C_NODE);
+	//const char *bme680_label =  /* TODO: insert device name from user */;
+	//const struct device *dev_bme = device_get_binding(bme680_label);
+	const struct device *const dev_bme = DEVICE_DT_GET(DT_NODELABEL(bme680_sensor));
 	struct sensor_value temp, press, humidity, gas_res;
 
 

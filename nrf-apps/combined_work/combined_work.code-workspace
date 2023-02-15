@@ -1,0 +1,48 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "bh1750",
+			"path": "../bh1750"
+		},
+		{
+			"path": "../../esp32-apps/openthread/ot_br"
+		},
+		{
+			"path": "../bme688"
+		},
+		{
+			"name": "bme680",
+			"path": "../../ncs/v2.1.2/zephyr/samples/sensor/bme680"
+		},
+		{
+			"path": "../../esp32-apps/display_test"
+		},
+		{
+			"name": "Battery",
+			"path": "../Battery"
+		}
+	],
+	"settings": {
+		"nrf-connect.applications": [
+			"${workspaceFolder}",
+			"c:\\Diplomna\\nrf-apps\\bh1750",
+			"c:\\Diplomna\\nrf-apps\\bme688",
+			"c:\\Diplomna\\ncs\\v2.1.2\\zephyr\\samples\\sensor\\bme680",
+			"c:\\Diplomna\\nrf-apps\\Battery"
+		],
+		"nrf-connect.topdir": "${nrf-connect.sdk:2.1.2}",
+		"nrf-connect.toolchain.path": "${nrf-connect.toolchain:2.1.2}",
+		"files.associations": {
+			"xutility": "c",
+			"uart.h": "c",
+			"kernel.h": "c",
+			"log.h": "c"
+		},
+		"nrf-connect.boardRoots": [
+			"${workspaceFolder}"
+		]
+	}
+}

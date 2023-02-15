@@ -1,16 +1,15 @@
 &i2c0 {
-	bh1750: bh1750@23 {
-		compatible = "rohm,bh1750";
-		reg = <0x23>;
-		status = "okay";
-	};
-};
-
-&i2c1 {
-	bme680: bme680@76 {
+	// bh1750@23 {
+	// 	compatible = "rohm,bh1750";
+	// 	reg = <0x23>;
+	// 	status = "okay";
+	// 	label = "BH1750";
+	// };
+	bme680_sensor: bme680@76 {
 		compatible = "bosch,bme680";
 		reg = <0x76>;
 		status = "okay";
+		label = "BME680";
 	};
 };
 

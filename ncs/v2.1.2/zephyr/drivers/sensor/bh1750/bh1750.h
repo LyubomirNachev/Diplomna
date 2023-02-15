@@ -12,6 +12,12 @@
 #define BH1750_POWER_ON          0x01
 #define I2C_NODE                 DT_NODELABEL(i2c0) 
 
+
+
+
+
+
+
 #if CONFIG_BH1750_MODE_CHM
     #define BH1750_MODE 0b00010000 
 #elif CONFIG_BH1750_MODE_CHM_2

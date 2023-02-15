@@ -5,6 +5,7 @@
 
 float measuringTimeFactor = 1;
 uint8_t i2c_buffer[2];
+
 static const struct device *dev = DEVICE_DT_GET(I2C_NODE);
 int err;
 
