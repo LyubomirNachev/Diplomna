@@ -19,6 +19,38 @@
 #include <zephyr/drivers/i2c.h>
 #include <inttypes.h>
 
+#include <zephyr/drivers/adc.h>
+
+
+//Battery
+#define ADC_NODE DT_NODELABEL(adc)
+static const struct device *adc_dev = DEVICE_DT_GET(ADC_NODE);
+
+#define ADC_RESOLUTION		10
+#define ADC_GAIN			ADC_GAIN_1_5
+#define ADC_REFERENCE		ADC_REF_INTERNAL
+#define ADC_PORT SAADC_CH_PSELP_PSELP_AnalogInput0
+#define ADC_CHANNEL 0
+
+struct adc_channel_cfg chl0_cfg = {
+	.gain = ADC_GAIN,
+	.reference = ADC_REFERENCE,
+	.acquisition_time = ADC_ACQ_TIME_DEFAULT,
+	.channel_id = ADC_CHANNEL,
+#ifdef CONFIG_ADC_NRFX_SAADC
+	.input_positive = ADC_PORT
+#endif
+};  
+
+int16_t sample_buffer[1];
+struct adc_sequence sequence = {
+	.channels = BIT(ADC_CHANNEL),
+	.buffer = sample_buffer,
+	.buffer_size = sizeof(sample_buffer),
+	.resolution = ADC_RESOLUTION
+};
+//Battery
+
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
 #define BUTTON0_NODE DT_NODELABEL(button0)
@@ -77,6 +109,7 @@ void main(void)
 	int ret;
 	const struct device *dev;
 	uint32_t dtr = 0U;
+	int err = adc_channel_setup(adc_dev, &chl0_cfg);
 
 	ret = usb_enable(NULL);
 	if (ret != 0) {
@@ -118,6 +151,13 @@ void main(void)
 				humidity.val1, humidity.val2, gas_res.val1,
 				gas_res.val2);
 		udp_send(getLux());
+		err = adc_read(adc_dev, &sequence);
+		LOG_INF("ADC: %d\n", sample_buffer[0]);
+		int32_t mv_value = sample_buffer[0];
+		int32_t adc_vref = adc_ref_internal(adc_dev);
+		adc_raw_to_millivolts(adc_vref, ADC_GAIN, ADC_RESOLUTION, &mv_value);
+		int32_t current_consumption = (int32_t)((mv_value/100000.0)*1000000.0);
+		LOG_INF("ADC converted: %d mV; %d uA\n", mv_value, current_consumption);
 		k_sleep(K_MSEC(1000));
 	}
 
