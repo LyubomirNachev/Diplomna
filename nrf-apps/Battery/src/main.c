@@ -8,13 +8,6 @@
 
 #include <zephyr/drivers/adc.h>
 
-
-// Simple analog input method
-// this just reads a sample then waits then returns it
-
-// ADC Sampling Settings
-// doc says that impedance of 800K == 40usec sample time
-
 #include <drivers/adc.h>
 #include <string.h>
 
@@ -72,7 +65,8 @@ void main(void){
 		int32_t mv_value = sample_buffer[0];
 		int32_t adc_vref = adc_ref_internal(adc_dev);
 		adc_raw_to_millivolts(adc_vref, ADC_GAIN, ADC_RESOLUTION, &mv_value);
-		printk("ADC converted: %d mV\n", mv_value);
+		int32_t current_consumption = (int32_t)((mv_value/100000.0)*1000000.0);
+		printk("ADC converted: %d mV; %d uA\n", mv_value, current_consumption);
 		k_msleep(1000);
 	}
 
