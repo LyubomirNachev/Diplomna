@@ -7,17 +7,6 @@ tests:
     integration_platforms:
       - nrf52840dongle_nrf52840
     platform_allow: nrf52840dongle_nrf52840
-#  sample.sensor.bme688:
-#    harness: console
-#    tags: sensors
-#    platform_allow: nrf52840dongle_nrf52840
-#    integration_platforms:
-#      - nrf52840dongle_nrf52840
-#    harness_config:
-#        type: one_line
-#        regex:
-#            - "temp: (.*); press: (.*); humidity: (.*)"
-#        fixture: fixture_i2c_bme688
   sample.sensor.bme688.i2c:
     harness: console
     tags: sensors

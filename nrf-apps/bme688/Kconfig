@@ -1,26 +1,5 @@
-# Copyright (c) 2020, Nordic Semiconductor ASA
-# SPDX-License-Identifier: Apache-2.0
-
-config LOG
-	default y
-
-config LOG_PRINTK
-	default y
-
-config SENSOR_LOG_LEVEL
-	default 4
-
-config I2C
-	default y
-
 config USB_DEVICE_PID
 	default USB_PID_CONSOLE_SAMPLE
 
 source "Kconfig.zephyr"
 
-menu "Zephyr Kernel"
-endmenu
-
-#module = OT_COMMAND_LINE_INTERFACE
-#module-str = ot_cli
-#source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"

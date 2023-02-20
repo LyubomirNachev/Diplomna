@@ -10,32 +10,8 @@
 #include <sys/printk.h>
 #include <inttypes.h>
 
-#define SLEEP_TIME_MS   1000
-
-static const struct device *get_bme688_device(void)
-{
-	const struct device *dev = DEVICE_DT_GET_ANY(bosch_bme688);
-    //const struct device *dev = device_get_binding(DT_LABEL(DT_INST(0, bosch_bme688)));
-	if (dev == NULL) {
-		printk("\nError: no device found.\n");
-		return NULL;
-	}
-
-	if (!device_is_ready(dev)) {
-		printk("\nError: Device \"%s\" is not ready; "
-		       "check the driver initialization logs for errors.\n",
-		       dev->name);
-		return NULL;
-	}
-
-	printk("Found device \"%s\", getting sensor data\n", dev->name);
-	return dev;
-}
-
-#define ID DT_NODELABEL(bme680)
-//DT_PROP(DT_CHILD(ID, bme680_76), status)
-
 void main(void){
+	const struct device *dev = DEVICE_DT_GET_ANY(bosch_bme688);
     struct sensor_value temp, press, humidity, gas_res;
     const struct device *dev_console = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
     uint32_t dtr = 0;
@@ -51,11 +27,12 @@ void main(void){
 		k_sleep(K_MSEC(100));
 	}
 
-    static const struct device *dev =  DEVICE_DT_GET(DT_PROP(DT_CHILD(ID, bme680_76)));
-    if (dev == NULL) {
-            printk("Eroorasdfsd");
-		    return;
+	if (dev == NULL) {
+		printk("\nError: no device found.\n");
 	}
+
+	printk("Found device \"%s\", getting sensor data\n", dev->name);
+
     while (1) {
 		sensor_sample_fetch(dev);
 		sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP, &temp);
