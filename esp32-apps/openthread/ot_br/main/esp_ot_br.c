@@ -265,27 +265,27 @@ static void udp_socket_server_task(void *pvParameters)
     err = bind(listen_sock, (struct sockaddr *)&listen_addr, sizeof(listen_addr));
     ESP_GOTO_ON_FALSE((err == 0), ESP_FAIL, exit, TAG, "Socket unable to bind: errno %d", errno);
     ESP_LOGI(TAG, "Socket bound, port %d", port);
-while(1){
-    timeout.tv_sec = 0;
-    setsockopt(listen_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+    while(1){
+        timeout.tv_sec = 0;
+        setsockopt(listen_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
-    ESP_LOGI(TAG, "Waiting for data, no timeout");
-    socklen_t socklen = sizeof(source_addr);
-    len = recvfrom(listen_sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *)&source_addr, &socklen);
+        ESP_LOGI(TAG, "Waiting for data, no timeout");
+        socklen_t socklen = sizeof(source_addr);
+        len = recvfrom(listen_sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *)&source_addr, &socklen);
 
-    // Error occurred during receiving
-    ESP_GOTO_ON_FALSE((len >= 0), ESP_FAIL, exit, TAG, "recvfrom failed: errno %d", errno);
-    // Data received
-    // Get the sender's ip address as string
-    inet6_ntoa_r(((struct sockaddr_in6 *)&source_addr)->sin6_addr, addr_str, sizeof(addr_str) - 1);
+        // Error occurred during receiving
+        ESP_GOTO_ON_FALSE((len >= 0), ESP_FAIL, exit, TAG, "recvfrom failed: errno %d", errno);
+        // Data received
+        // Get the sender's ip address as string
+        inet6_ntoa_r(((struct sockaddr_in6 *)&source_addr)->sin6_addr, addr_str, sizeof(addr_str) - 1);
 
-    rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string...
-    ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
-    ESP_LOGI(TAG, "%s", rx_buffer);
+        rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string...
+        ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
+        ESP_LOGI(TAG, "%s", rx_buffer);
 
-    err = sendto(listen_sock, payload, strlen(payload), 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
-    ESP_GOTO_ON_FALSE((err >= 0), ESP_FAIL, exit, TAG, "Error occurred during sending: errno %d", errno);
-}
+        err = sendto(listen_sock, payload, strlen(payload), 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
+        ESP_GOTO_ON_FALSE((err >= 0), ESP_FAIL, exit, TAG, "Error occurred during sending: errno %d", errno);
+    }
 exit:
     if (ret != ESP_OK) {
         shutdown(listen_sock, 0);
@@ -376,13 +376,6 @@ static void ws_async_resp(void *arg)
     ESP_LOGI(TAG, "Executing queued work fd: %d", fd);
     httpd_socket_send(hd, fd, http_str, strlen(http_str), 0);
     httpd_socket_send(hd, fd, data_str, strlen(data_str), 0);
-
-    // httpd_ws_frame_t ws_pkt;
-    // memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
-    // ws_pkt.payload = (uint8_t*)data;
-    // ws_pkt.len = strlen(data);
-    // ws_pkt.type = HTTPD_WS_TYPE_TEXT;
-    // httpd_ws_send_frame_async(hd, fd, &ws_pkt);
     free(arg);
 }
 static esp_err_t async_get_handler(httpd_req_t *req)
@@ -466,3 +459,237 @@ void app_main(void)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
+
+// #include "esp_check.h"
+// #include "esp_err.h"
+// #include "esp_event.h"
+// #include "esp_log.h"
+// #include "esp_netif.h"
+// #include "esp_netif_ip_addr.h"
+// #include "esp_netif_net_stack.h"
+// #include "esp_openthread.h"
+// #include "esp_openthread_border_router.h"
+// #include "esp_openthread_cli.h"
+// #include "esp_openthread_lock.h"
+// #include "esp_openthread_netif_glue.h"
+// #include "esp_openthread_types.h"
+// #include "esp_ot_cli_extension.h"
+// #include "esp_ot_config.h"
+// #include "esp_ot_wifi_cmd.h"
+// #include "esp_vfs_dev.h"
+// #include "esp_vfs_eventfd.h"
+// #include "esp_wifi.h"
+// #include "mdns.h"
+// #include "nvs_flash.h"
+// #include "protocol_examples_common.h"
+// #include "sdkconfig.h"
+// #include "driver/uart.h"
+// #include "freertos/FreeRTOS.h"
+// #include "freertos/task.h"
+// #include "hal/uart_types.h"
+// #include "openthread/backbone_router_ftd.h"
+// #include "openthread/border_router.h"
+// #include "openthread/cli.h"
+// #include "openthread/dataset.h"
+// #include "openthread/dataset_ftd.h"
+// #include "openthread/dataset_updater.h"
+// #include "openthread/error.h"
+// #include "openthread/instance.h"
+// #include "openthread/ip6.h"
+// #include "openthread/logging.h"
+// #include "openthread/tasklet.h"
+// #include "openthread/thread_ftd.h"
+
+// #define TAG "esp_ot_br"
+
+
+// #if CONFIG_OPENTHREAD_BR_AUTO_START
+// static int hex_digit_to_int(char hex)
+// {
+//     if ('A' <= hex && hex <= 'F') {
+//         return 10 + hex - 'A';
+//     }
+//     if ('a' <= hex && hex <= 'f') {
+//         return 10 + hex - 'a';
+//     }
+//     if ('0' <= hex && hex <= '9') {
+//         return hex - '0';
+//     }
+//     return -1;
+// }
+
+// static size_t hex_string_to_binary(const char *hex_string, uint8_t *buf, size_t buf_size)
+// {
+//     int num_char = strlen(hex_string);
+
+//     if (num_char != buf_size * 2) {
+//         return 0;
+//     }
+//     for (size_t i = 0; i < num_char; i += 2) {
+//         int digit0 = hex_digit_to_int(hex_string[i]);
+//         int digit1 = hex_digit_to_int(hex_string[i + 1]);
+
+//         if (digit0 < 0 || digit1 < 0) {
+//             return 0;
+//         }
+//         buf[i / 2] = (digit0 << 4) + digit1;
+//     }
+
+//     return buf_size;
+// }
+
+// static void create_config_network(otInstance *instance)
+// {
+//     otOperationalDataset dataset;
+
+//     if (otDatasetGetActive(instance, &dataset) == OT_ERROR_NONE) {
+//         ESP_LOGI(TAG, "Already has network, skip configuring OpenThread network.");
+//         return;
+//     }
+
+//     uint16_t network_name_len = strlen(CONFIG_OPENTHREAD_NETWORK_NAME);
+
+//     assert(network_name_len <= OT_NETWORK_NAME_MAX_SIZE);
+
+//     if (otDatasetCreateNewNetwork(instance, &dataset) != OT_ERROR_NONE) {
+//         ESP_LOGE(TAG, "Failed to create OpenThread network dataset.");
+//         abort();
+//     }
+//     dataset.mChannel = CONFIG_OPENTHREAD_NETWORK_CHANNEL;
+//     dataset.mComponents.mIsChannelPresent = true;
+//     dataset.mPanId = CONFIG_OPENTHREAD_NETWORK_PANID;
+//     dataset.mComponents.mIsPanIdPresent = true;
+//     memcpy(dataset.mNetworkName.m8, CONFIG_OPENTHREAD_NETWORK_NAME, network_name_len);
+//     dataset.mComponents.mIsNetworkNamePresent = true;
+//     if (hex_string_to_binary(CONFIG_OPENTHREAD_NETWORK_EXTPANID, dataset.mExtendedPanId.m8,
+//                              sizeof(dataset.mExtendedPanId.m8)) != sizeof(dataset.mExtendedPanId.m8)) {
+//         ESP_LOGE(TAG, "Cannot convert OpenThread extended pan id. Please double-check your config.");
+//         abort();
+//     }
+//     dataset.mComponents.mIsExtendedPanIdPresent = true;
+//     if (hex_string_to_binary(CONFIG_OPENTHREAD_NETWORK_MASTERKEY, dataset.mNetworkKey.m8,
+//                              sizeof(dataset.mNetworkKey.m8)) != sizeof(dataset.mNetworkKey.m8)) {
+//         ESP_LOGE(TAG, "Cannot convert OpenThread master key. Please double-check your config.");
+//         abort();
+//     }
+//     dataset.mComponents.mIsNetworkKeyPresent = true;
+//     if (hex_string_to_binary(CONFIG_OPENTHREAD_NETWORK_PSKC, dataset.mPskc.m8, sizeof(dataset.mPskc.m8)) !=
+//             sizeof(dataset.mPskc.m8)) {
+//         ESP_LOGE(TAG, "Cannot convert OpenThread pre-shared commissioner key. Please double-check your config.");
+//         abort();
+//     }
+//     dataset.mComponents.mIsPskcPresent = true;
+//     if (otDatasetSetActive(instance, &dataset) != OT_ERROR_NONE) {
+//         ESP_LOGE(TAG, "Failed to set OpenThread active dataset.");
+//         abort();
+//     }
+//     return;
+// }
+
+// static void launch_openthread_network(otInstance *instance)
+// {
+//     if (otIp6SetEnabled(instance, true) != OT_ERROR_NONE) {
+//         ESP_LOGE(TAG, "Failed to enable OpenThread IP6 link");
+//         abort();
+//     }
+//     if (otThreadSetEnabled(instance, true) != OT_ERROR_NONE) {
+//         ESP_LOGE(TAG, "Failed to enable OpenThread");
+//         abort();
+//     }
+//     if (otBorderRouterRegister(instance) != OT_ERROR_NONE) {
+//         ESP_LOGE(TAG, "Failed to register border router.");
+//         abort();
+//     }
+//     otBackboneRouterSetEnabled(instance, true);
+// }
+// #endif // CONFIG_OPENTHREAD_BR_AUTO_START
+
+// static void ot_task_worker(void *aContext)
+// {
+//     esp_openthread_platform_config_t config = {
+//         .radio_config = ESP_OPENTHREAD_DEFAULT_RADIO_CONFIG(),
+//         .host_config = ESP_OPENTHREAD_DEFAULT_HOST_CONFIG(),
+//         .port_config = ESP_OPENTHREAD_DEFAULT_PORT_CONFIG(),
+//     };
+
+//     esp_netif_config_t cfg = ESP_NETIF_DEFAULT_OPENTHREAD();
+//     esp_netif_t       *openthread_netif = esp_netif_new(&cfg);
+//     assert(openthread_netif != NULL);
+//     // Initialize the OpenThread stack
+
+//     ESP_ERROR_CHECK(esp_openthread_init(&config));
+
+//     // Initialize border routing features
+//     esp_openthread_lock_acquire(portMAX_DELAY);
+//     ESP_ERROR_CHECK(esp_netif_attach(openthread_netif, esp_openthread_netif_glue_init(&config)));
+
+//     (void)otLoggingSetLevel(CONFIG_LOG_DEFAULT_LEVEL);
+//     esp_openthread_cli_init();
+// #if CONFIG_OPENTHREAD_BR_AUTO_START
+//     ESP_ERROR_CHECK(esp_openthread_border_router_init());
+//     create_config_network(esp_openthread_get_instance());
+//     launch_openthread_network(esp_openthread_get_instance());
+// #endif // CONFIG_OPENTHREAD_BR_AUTO_START
+//     esp_cli_custom_command_init();
+//     esp_openthread_lock_release();
+
+//     // Run the main loop
+//     esp_openthread_cli_create_task();
+//     esp_openthread_launch_mainloop();
+
+//     // Clean up
+//     esp_netif_destroy(openthread_netif);
+//     esp_openthread_netif_glue_deinit();
+//     esp_vfs_eventfd_unregister();
+//     vTaskDelete(NULL);
+// }
+
+// void app_main(void)
+// {
+//     // Used eventfds:
+//     // * netif
+//     // * task queue
+//     // * border router
+//     esp_vfs_eventfd_config_t eventfd_config = {
+//         .max_fds = 3,
+//     };
+//     ESP_ERROR_CHECK(esp_vfs_eventfd_register(&eventfd_config));
+
+//     ESP_ERROR_CHECK(nvs_flash_init());
+//     ESP_ERROR_CHECK(esp_netif_init());
+//     ESP_ERROR_CHECK(esp_event_loop_create_default());
+
+//     #if CONFIG_OPENTHREAD_BR_AUTO_START
+//         ESP_ERROR_CHECK(example_connect());
+//         ESP_ERROR_CHECK(esp_wifi_set_ps(WIFI_PS_NONE));
+//         esp_openthread_set_backbone_netif(get_example_netif());
+//     #else
+//         esp_ot_wifi_netif_init();
+//         esp_openthread_set_backbone_netif(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"));
+//     #endif // CONFIG_OPENTHREAD_BR_AUTO_START
+//         ESP_ERROR_CHECK(mdns_init());
+//         ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
+//         //OT_BR_INIT
+//         xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL);
+// }
