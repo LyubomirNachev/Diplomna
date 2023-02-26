@@ -58,10 +58,10 @@ static const struct gpio_dt_spec button0_spec = GPIO_DT_SPEC_GET(BUTTON0_NODE, g
 static struct gpio_callback button0_cb;
 
 
-static void udp_send(int val1){
+static void udp_send(int light, int temp1, int temp2, int hum1, int hum2, int press1, int press2, int gas1, int gas2, float bat_lvl){
 	otError			error = OT_ERROR_NONE;
-	char data[30];
-	sprintf(data, "%d", val1);
+	char data[300];
+	sprintf(data, "Light: %dlx Temp: %d.%d°C Humidity: %d.%d%% Pressure: %d.%dhPa Gas: %d.%dΩ Battery: %dmV", light, temp1, temp2, hum1, hum2, press1, press2, gas1, gas2, bat_lvl);
 	char *buf = &data;
 	otInstance *myInstance;
 	myInstance = openthread_get_default_instance();
@@ -104,8 +104,10 @@ void main(void)
 	gpio_init_callback(&button0_cb, button_pressed_callback, BIT(button0_spec.pin));
 	gpio_add_callback(button0_spec.port, &button0_cb);
 
-
-	otPlatRadioSetTransmitPower(NULL, 8);
+	otInstance *myInstance;
+	myInstance = openthread_get_default_instance();
+	otPlatRadioSetTransmitPower(myInstance, 8);
+	
 	int ret;
 	const struct device *dev;
 	uint32_t dtr = 0U;
@@ -138,26 +140,25 @@ void main(void)
 	const struct device *const dev_bme = DEVICE_DT_GET(DT_NODELABEL(bme688_sensor));
 	struct sensor_value temp, press, humidity, gas_res;
 
-
 	while(1){
+
 		sensor_sample_fetch(dev_bme);
 		sensor_channel_get(dev_bme, SENSOR_CHAN_AMBIENT_TEMP, &temp);
 		sensor_channel_get(dev_bme, SENSOR_CHAN_PRESS, &press);
 		sensor_channel_get(dev_bme, SENSOR_CHAN_HUMIDITY, &humidity);
 		sensor_channel_get(dev_bme, SENSOR_CHAN_GAS_RES, &gas_res);
-
-		LOG_INF("T: %d.%06d; P: %d.%06d; H: %d.%06d; G: %d.%06d\n",
-				temp.val1, temp.val2, press.val1, press.val2,
-				humidity.val1, humidity.val2, gas_res.val1,
-				gas_res.val2);
-		udp_send(getLux());
+		//LOG_INF("T: %d.%06d; P: %d.%06d; H: %d.%06d; G: %d.%06d\n",temp.val1, temp.val2, press.val1, press.val2,humidity.val1, humidity.val2, gas_res.val1,gas_res.val2);
 		err = adc_read(adc_dev, &sequence);
-		LOG_INF("ADC: %d\n", sample_buffer[0]);
+		//LOG_INF("ADC: %d\n", sample_buffer[0]);
 		int32_t mv_value = sample_buffer[0];
 		int32_t adc_vref = adc_ref_internal(adc_dev);
 		adc_raw_to_millivolts(adc_vref, ADC_GAIN, ADC_RESOLUTION, &mv_value);
 		int32_t current_consumption = (int32_t)((mv_value/100000.0)*1000000.0);
-		LOG_INF("ADC converted: %d mV; %d uA\n", mv_value, current_consumption);
+		//LOG_INF("ADC converted: %d mV; %d uA\n", mv_value, current_consumption);
+		
+
+		udp_send(getLux(), temp.val1, temp.val2, humidity.val1, humidity.val2, press.val1, press.val2, gas_res.val1, gas_res.val2, mv_value);
+
 		k_sleep(K_MSEC(1000));
 	}
 

@@ -57,8 +57,6 @@
 #include <lwip/api.h>
 #include <lwip/netdb.h>
 
-char on_resp[] = "<!DOCTYPE html><html><head><style>body {background-color: rgb(219, 221, 123);}h1 {text-align:center;font-family:verdana;color: blue;} p {margin: auto;width: 320px; padding: 10px;border: 2px solid black;text-align:center;font-family:verdana;color: red;}</style><title>Page Title</title></head><body><h1>TEST</h1><p>Oh Oh!</p></body></html>";
-char off_resp[] = "<!DOCTYPE html><html><head><style>body {background-color: rgb(219, 221, 123);}h1 {text-align:center;font-family:verdana;color: blue;} p {margin: auto;width: 320px; padding: 10px;border: 2px solid black;text-align:center;font-family:verdana;color: red;}</style><title>Page Title</title></head><body><h1>TEST</h1><p>Hello Thread!</p></body></html>";
 
 #define TAG "esp_ot_br"
 
@@ -236,23 +234,21 @@ int len;
 
 static void udp_socket_server_task(void *pvParameters)
 {
-    char addr_str[128];
-    char *payload = "This message is from server\n";
-    esp_err_t ret = ESP_OK;
     int err = 0;
-    
+    esp_err_t ret = ESP_OK;
+    char addr_str[128];
     int listen_sock;
-
     int port = CONFIG_OPENTHREAD_CLI_UDP_SERVER_PORT;
+    
     struct timeval timeout = {0};
-    struct sockaddr_storage source_addr; // Large enough for both IPv4 or IPv6
+    struct sockaddr_storage source_addr;
     struct sockaddr_in6 listen_addr;
 
     inet6_aton("::", &listen_addr.sin6_addr);
     listen_addr.sin6_family = AF_INET6;
     listen_addr.sin6_port = htons(port);
 
-    listen_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+    listen_sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP); // socket(domain,type,protocol)   
     ESP_GOTO_ON_FALSE((listen_sock >= 0), ESP_OK, exit, TAG, "Unable to create socket: errno %d", errno);
     ESP_LOGI(TAG, "Socket created");
 
@@ -265,11 +261,10 @@ static void udp_socket_server_task(void *pvParameters)
     err = bind(listen_sock, (struct sockaddr *)&listen_addr, sizeof(listen_addr));
     ESP_GOTO_ON_FALSE((err == 0), ESP_FAIL, exit, TAG, "Socket unable to bind: errno %d", errno);
     ESP_LOGI(TAG, "Socket bound, port %d", port);
+    ESP_LOGI(TAG, "Waiting for data, no timeout");
     while(1){
         timeout.tv_sec = 0;
         setsockopt(listen_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
-
-        ESP_LOGI(TAG, "Waiting for data, no timeout");
         socklen_t socklen = sizeof(source_addr);
         len = recvfrom(listen_sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *)&source_addr, &socklen);
 
@@ -282,9 +277,6 @@ static void udp_socket_server_task(void *pvParameters)
         rx_buffer[len] = 0; // Null-terminate whatever we received and treat like a string...
         ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
         ESP_LOGI(TAG, "%s", rx_buffer);
-
-        err = sendto(listen_sock, payload, strlen(payload), 0, (struct sockaddr *)&source_addr, sizeof(source_addr));
-        ESP_GOTO_ON_FALSE((err >= 0), ESP_FAIL, exit, TAG, "Error occurred during sending: errno %d", errno);
     }
 exit:
     if (ret != ESP_OK) {
@@ -294,68 +286,6 @@ exit:
     ESP_LOGI(TAG, "Socket server is closed.");
     vTaskDelete(NULL);
 }
-
-//Web page functions
-
-// esp_err_t send_web_page(httpd_req_t *req)
-// {
-//     int response;
-//     if (len == 12){
-//         response = httpd_resp_send(req, off_resp, HTTPD_RESP_USE_STRLEN);
-//         len = 0;
-//     }
-//     else{
-//         response = httpd_resp_send(req, on_resp, HTTPD_RESP_USE_STRLEN);
-//     }
-//     return response;
-// }
-// esp_err_t get_req_handler(httpd_req_t *req)
-// {
-//     return send_web_page(req);
-// }
-
-// esp_err_t messg_rcv_handler(httpd_req_t *req)
-// {
-//     return send_web_page(req);
-// }
-
-// esp_err_t messg_no_rcv_handler(httpd_req_t *req)
-// {
-//     return send_web_page(req);
-// }
-
-// httpd_uri_t uri_get = {
-//     .uri = "/",
-//     .method = HTTP_GET,
-//     .handler = get_req_handler,
-//     .user_ctx = NULL};
-
-// httpd_uri_t uri_on = {
-//     .uri = "/Received",
-//     .method = HTTP_GET,
-//     .handler = messg_rcv_handler,
-//     .user_ctx = NULL};
-
-// httpd_uri_t uri_off = {
-//     .uri = "/Oh_oh",
-//     .method = HTTP_GET,
-//     .handler =messg_no_rcv_handler,
-//     .user_ctx = NULL};
-
-// httpd_handle_t setup_server(void)
-// {
-//     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-//     httpd_handle_t server = NULL;
-
-//     if (httpd_start(&server, &config) == ESP_OK)
-//     {
-//         httpd_register_uri_handler(server, &uri_get);
-//         httpd_register_uri_handler(server, &uri_on);
-//         httpd_register_uri_handler(server, &uri_off);
-//     }
-
-//     return server;
-// }
 
 struct async_resp_arg {
     httpd_handle_t hd;
@@ -405,8 +335,6 @@ static void start_webserver(void)
 }
 
 
-
-
 void app_main(void)
 {
     // Used eventfds:
@@ -436,7 +364,7 @@ void app_main(void)
         xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL);
         //Udp init
         xTaskCreate(udp_socket_server_task, "ot_udp_scoket_server", 4096, xTaskGetCurrentTaskHandle(), 4, NULL);
-        //Web Page init
+        
         esp_err_t ret = nvs_flash_init();
         if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
         {
@@ -444,7 +372,7 @@ void app_main(void)
             ret = nvs_flash_init();
         }
         ESP_ERROR_CHECK(ret);
-
+        //Web Page init
         ESP_LOGI(TAG, "Socket is running ... ...\n");
         start_webserver();
 
@@ -454,7 +382,7 @@ void app_main(void)
         ssd1306_clear_screen(&dev, false);
         ssd1306_contrast(&dev, 0xff);
         ssd1306_display_text(&dev, 1, "IP:          ", 16, false);
-        ssd1306_display_text(&dev, 2, "192.168.0.106", 16, false);
+        ssd1306_display_text(&dev, 2, "192.168.2.46", 16, false);
 }
 
 

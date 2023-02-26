@@ -67,9 +67,11 @@ void main(void){
 		adc_raw_to_millivolts(adc_vref, ADC_GAIN, ADC_RESOLUTION, &mv_value);
 		int32_t current_consumption = (int32_t)((mv_value/100000.0)*1000000.0);
 		printk("ADC converted: %d mV; %d uA\n", mv_value, current_consumption);
+		if (mv_value > 4.00){
+			printk("Percentage = 100");
+		}else if(mv_value < 4.00 && mv_value > 3.75){
+			printk("Percentage = 90");
+		}else if()
 		k_msleep(1000);
 	}
-
-
-
 }

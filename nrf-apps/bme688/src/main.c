@@ -1,19 +1,16 @@
+#include <stdio.h>
 #include <zephyr.h>
 #include <device.h>
 #include <devicetree.h>
 #include <drivers/sensor.h>
-#include <stdio.h>
 #include <usb/usb_device.h>
 #include <drivers/uart.h>
-#include <drivers/gpio.h>
-#include <sys/util.h>
 #include <sys/printk.h>
-#include <inttypes.h>
 
 void main(void){
 	const struct device *dev = DEVICE_DT_GET_ANY(bosch_bme688);
+	const struct device *dev_console = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
     struct sensor_value temp, press, humidity, gas_res;
-    const struct device *dev_console = DEVICE_DT_GET(DT_CHOSEN(zephyr_console));
     uint32_t dtr = 0;
 
     if (usb_enable(NULL)){
@@ -31,8 +28,6 @@ void main(void){
 		printk("\nError: no device found.\n");
 	}
 
-	printk("Found device \"%s\", getting sensor data\n", dev->name);
-
     while (1) {
 		sensor_sample_fetch(dev);
 		sensor_channel_get(dev, SENSOR_CHAN_AMBIENT_TEMP, &temp);
@@ -44,6 +39,6 @@ void main(void){
 				temp.val1, temp.val2, press.val1, press.val2,
 				humidity.val1, humidity.val2, gas_res.val1,
 				gas_res.val2);
-        k_sleep(K_MSEC(1000));
+        k_sleep(K_MSEC(10000));
     }
 }
