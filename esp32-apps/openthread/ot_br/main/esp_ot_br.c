@@ -337,6 +337,7 @@ static void start_webserver(void)
 
 void app_main(void)
 {
+    esp_netif_ip_info_t ip_info;
     // Used eventfds:
     // * netif
     // * task queue
@@ -375,14 +376,19 @@ void app_main(void)
         //Web Page init
         ESP_LOGI(TAG, "Socket is running ... ...\n");
         start_webserver();
-
         SSD1306_t dev;
-	    i2c_master_init(&dev, CONFIG_SDA_GPIO, CONFIG_SCL_GPIO, CONFIG_RESET_GPIO);	
+        i2c_master_init(&dev, CONFIG_SDA_GPIO, CONFIG_SCL_GPIO, CONFIG_RESET_GPIO);	
         ssd1306_init(&dev, 128, 64);
         ssd1306_clear_screen(&dev, false);
         ssd1306_contrast(&dev, 0xff);
-        ssd1306_display_text(&dev, 1, "IP:          ", 16, false);
-        ssd1306_display_text(&dev, 2, "192.168.2.46", 16, false);
+        while(1){
+            char data[16];
+            ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info));
+            sprintf(data, "%d.%d.%d.%d", IP2STR(&ip_info.ip));
+            ssd1306_display_text(&dev, 1, "IP:          ", 16, false);
+            ssd1306_display_text(&dev, 2, data, 16, false);
+            vTaskDelay(10000 / portTICK_PERIOD_MS);
+        }
 }
 
 
