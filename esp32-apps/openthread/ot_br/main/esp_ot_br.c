@@ -251,7 +251,9 @@ static void udp_socket_server_task(void *pvParameters)
         setsockopt(listen_sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
     
         socklen_t socklen = sizeof(source_addr);
-        len = recvfrom(listen_sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *)&source_addr, &socklen);  /////////////////////////////////////////////////////
+
+        // Get the length of the received data and store it in rx_buffer 
+        len = recvfrom(listen_sock, rx_buffer, sizeof(rx_buffer) - 1, 0, (struct sockaddr *)&source_addr, &socklen);  
 
         // Error occurred during receiving
         ESP_GOTO_ON_FALSE((len >= 0), ESP_FAIL, exit, TAG, "recvfrom failed: errno %d", errno);
@@ -369,7 +371,7 @@ void app_main(void)
     
         start_webserver(); // Initialize the websocket server
         ESP_LOGI(TAG, "Socket is running ... ...\n");
-        
+
         SSD1306_t dev;
         i2c_master_init(&dev, CONFIG_SDA_GPIO, CONFIG_SCL_GPIO, CONFIG_RESET_GPIO);	// I2C master initialization
         ssd1306_init(&dev, 128, 64); // Initialize the display
