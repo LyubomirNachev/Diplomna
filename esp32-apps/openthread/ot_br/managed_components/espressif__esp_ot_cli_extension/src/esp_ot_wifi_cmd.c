@@ -25,7 +25,7 @@
 static EventGroupHandle_t wifi_event_group;
 const int CONNECTED_IP4_BIT = BIT0;
 const int CONNECTED_IP6_BIT = BIT1;
-bool s_wifi_connected = false;
+static bool s_wifi_connected = false;
 
 void esp_ot_wifi_netif_init(void)
 {
