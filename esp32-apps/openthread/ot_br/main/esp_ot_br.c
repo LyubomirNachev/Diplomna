@@ -349,10 +349,11 @@ void app_main(void)
         .max_fds = 3,
     };
     ESP_ERROR_CHECK(esp_vfs_eventfd_register(&eventfd_config)); // Initialize the eventfd virtual filesystem
-
     ESP_ERROR_CHECK(nvs_flash_init()); // Initialize the NVS flash memory
     ESP_ERROR_CHECK(esp_netif_init()); // Create the network interface for Thread
-    ESP_ERROR_CHECK(esp_event_loop_create_default()); // Create the system Event task and initialize an application event’s callback function.
+    
+    // Create the system Event task and initialize an app event’s callback function
+    ESP_ERROR_CHECK(esp_event_loop_create_default()); С
 
     #if CONFIG_OPENTHREAD_BR_AUTO_START
         ESP_ERROR_CHECK(example_connect()); // Establish a connection with the Wi-Fi network
@@ -366,8 +367,11 @@ void app_main(void)
         ESP_ERROR_CHECK(mdns_init()); //mDNS initialization 
         ESP_ERROR_CHECK(mdns_hostname_set("esp-ot-br"));
 
-        xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL); // Create a task for the OpenThread stack
-        xTaskCreate(udp_socket_server_task, "ot_udp_scoket_server", 4096, xTaskGetCurrentTaskHandle(), 4, NULL); // Create a task for the UDP socket
+        // Create a task for the OpenThread stack
+        xTaskCreate(ot_task_worker, "ot_br_main", 20480, xTaskGetCurrentTaskHandle(), 5, NULL); 
+
+        // Create a task for the UDP socket
+        xTaskCreate(udp_socket_server_task, "ot_udp_scoket_server", 4096, xTaskGetCurrentTaskHandle(), 4, NULL);
     
         start_webserver(); // Initialize the websocket server
         ESP_LOGI(TAG, "Socket is running ... ...\n");
@@ -381,7 +385,10 @@ void app_main(void)
         // Refresh every 10 seconds and update the display information
         while(1){ 
             char data[16];
-            ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info)); // Get the IPv4 address that is assigned to the ESP32
+
+            // Get the IPv4 address that is assigned to the ESP32
+            ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info)); 
+
             sprintf(data, "%d.%d.%d.%d", IP2STR(&ip_info.ip));
             ssd1306_display_text(&dev, 1, "IP:          ", 16, false); 
             ssd1306_display_text(&dev, 2, data, 16, false);
