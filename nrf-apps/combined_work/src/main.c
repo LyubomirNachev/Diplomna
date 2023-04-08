@@ -14,8 +14,8 @@ static void udp_send(int light, int temp1, int temp2, int hum1, int hum2,
  					 int press1, int press2, int gas1, int gas2){
 	otError	error = OT_ERROR_NONE;
 	char data[300];
-	sprintf(data, "Light: %dlx Temp: %d.%d°C Humidity: %d.%d%% Pressure: %d.%dhPa Gas: %d.%dΩ",
-				   light, temp1, temp2, hum1, hum2, press1, press2, gas1, gas2);
+	sprintf(data, "ID:%08X%08X Light: %dlx Temp: %d.%d°C Humidity: %d.%d%% Pressure: %d.%dhPa Gas: %d.%dΩ", 
+				    NRF_FICR->DEVICEID[0], NRF_FICR->DEVICEID[1], light, temp1, temp2, hum1, hum2, press1, press2, gas1, gas2);
 	otInstance *myInstance;
 	myInstance = openthread_get_default_instance();
 	otUdpSocket mySocket;
@@ -44,6 +44,8 @@ static void udp_send(int light, int temp1, int temp2, int hum1, int hum2,
 	
 	if(error == OT_ERROR_NONE){
 		LOG_INF("Send. %s\n", data);
+		LOG_INF("DEVICEID0: %08X\n", NRF_FICR->DEVICEID[0]);
+		LOG_INF("DEVICEID0: %08X\n", NRF_FICR->DEVICEID[1]);
 	}else{
 		LOG_INF("udpSend error: %d\n", error);
 	}
