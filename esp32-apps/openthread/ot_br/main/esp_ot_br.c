@@ -264,7 +264,7 @@ static void udp_socket_server_task(void *pvParameters)
         rx_buffer[len] = 0; // Null-terminate whatever we received and treat as a string
         ESP_LOGI(TAG, "Received %d bytes from %s:", len, addr_str);
         ESP_LOGI(TAG, "%s", rx_buffer);
-        int pos = 3;
+        int pos = 4;
         int len_get = 16;
         strncpy(substring,rx_buffer+(pos-1),len_get);
         ESP_LOGI(TAG, "%s", substring);
@@ -289,10 +289,10 @@ struct async_resp_arg {
 // Send an HTTP response asynchronously
 static void ws_async_resp(void *arg) 
 {
-    char http_str[600];
-    char page[600];
+    char http_str[150];
+    char page[300];
     //sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s </p></body></html>", rx_buffer);
-    char* addresses[3][16] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
+    //char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
     // char addresses[4];
     // for (int i; i<3;i++){ 
     //     if(addresses[i] == NULL){
@@ -300,13 +300,16 @@ static void ws_async_resp(void *arg)
     //     }
     // }
 
-    if (addresses[0] == substring){
-        sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1: %s </p><p> Data2:    </p><p> Data3:    </p></body></html>", rx_buffer);
-    }else if(addresses[1] == substring){
-        sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1:    </p><p> Data2: %s </p><p> Data3:    </p></body></html>", rx_buffer);
-    }else if(addresses[2] == substring){
-        sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1:    </p><p> Data2:    </p><p> Data3: %s </p></body></html>", rx_buffer);
-    }
+    // if (!strcmp(addresses[0],substring)){
+    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1: %s </p><p> Data2:    </p><p> Data3:    </p></body></html>", rx_buffer);
+    // }else if(!strcmp(addresses[1],substring)){
+    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1:    </p><p> Data2: %s </p><p> Data3:    </p></body></html>", rx_buffer);
+    // }else if(!strcmp(addresses[2],substring)){
+    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1:    </p><p> Data2:    </p><p> Data3: %s </p></body></html>", rx_buffer);
+    // }else{
+    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s  </p></body></html>", rx_buffer);
+    // }
+    sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s </p></body></html>", rx_buffer);
     char *data_str = page; // Get the received UDP data from OpenThread devices 
     sprintf(http_str, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", strlen(data_str)); // HTTP Response string
 
@@ -416,70 +419,3 @@ void app_main(void)
             vTaskDelay(10000 / portTICK_PERIOD_MS);
         }
 }
-
-/*
-    <p class="sensor_values">Sensor_values: <span id="sensor_values">%s</span></p>
-
-    <script>
-        var gateway = `192.168.0.106/ws`;
-        var websocket;
-        window.addEventListener('load', onLoad);
-        function initWebSocket() {
-            console.log('Trying to open a WebSocket connection...');
-            websocket = new WebSocket(gateway);
-            websocket.onopen = onOpen;
-            websocket.onclose = onClose;
-            websocket.onmessage = onMessage; // <-- add this line
-        }
-        function onOpen(event) {
-            console.log('Connection opened');
-        }
-        function onClose(event) {
-            console.log('Connection closed');
-            setTimeout(initWebSocket, 2000);
-        }
-        function onMessage(event) {
-            var sensor_values;
-            sensor_values = (event.data);
-            document.getElementById('sensor_values').innerHTML = sensor_values;
-        }
-        function onLoad(event) {
-            initWebSocket();
-        }
-    </script>
-
-
-<html>
-    <head><title>Data</title></head>
-    <body>
-        <p class="sensor_values">Sensor_values: <span id="sensor_values"> %s </span></p>
-        <script>
-            var gateway = `192.168.0.106/ws`;
-            var websocket;
-            window.addEventListener('load', onLoad);
-            function initWebSocket() {
-                console.log('Trying to open a WebSocket connection...');
-                websocket = new WebSocket(gateway);
-                websocket.onopen = onOpen;
-                websocket.onclose = onClose;
-                websocket.onmessage = onMessage; // <-- add this line
-            }
-            function onOpen(event) {
-                console.log('Connection opened');
-            }
-            function onClose(event) {
-                console.log('Connection closed');
-                setTimeout(initWebSocket, 2000);
-            }
-            function onMessage(event) {
-                var sensor_values;
-                sensor_values = (event.data);
-                document.getElementById('sensor_values').innerHTML = sensor_values;
-            }
-            function onLoad(event) {
-                initWebSocket();
-            }
-        </script>
-    </body>
-</html>
-*/
