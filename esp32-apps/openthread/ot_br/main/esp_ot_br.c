@@ -267,7 +267,7 @@ static void udp_socket_server_task(void *pvParameters)
         int pos = 4;
         int len_get = 16;
         strncpy(substring,rx_buffer+(pos-1),len_get);
-        ESP_LOGI(TAG, "%s", substring);
+        //ESP_LOGI(TAG, "%s", substring);
     }
 exit: // On error 
     if (ret != ESP_OK) {
@@ -286,30 +286,39 @@ struct async_resp_arg {
     int fd;             // Session socket file descriptor
 };
 
+char data1[110];
+char data2[110];
+char data3[110];
+    char adr_temp[17];
+    char addresses1[10][17];
+    int i;
 // Send an HTTP response asynchronously
 static void ws_async_resp(void *arg) 
 {
     char http_str[150];
-    char page[300];
+    char page[1000];
     //sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s </p></body></html>", rx_buffer);
-    //char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
-    // char addresses[4];
-    // for (int i; i<3;i++){ 
-    //     if(addresses[i] == NULL){
-    //         memcpy(addresses[i], substring, strlen(substring)+1);
+    char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
+
+    // for (i=0;i<10;i++){
+    //     if (addresses1[i] != NULL && addresses1[i] == substring){
+    //         break;
+    //     }else if (addresses1[i] == NULL && adr_temp != addresses1[i]){
+    //         memcpy(addresses1[i], substring, strlen(substring)+1);
+    //         memcpy(adr_temp, addresses1[i], strlen(addresses1[i])+1);
     //     }
     // }
 
-    // if (!strcmp(addresses[0],substring)){
-    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1: %s </p><p> Data2:    </p><p> Data3:    </p></body></html>", rx_buffer);
-    // }else if(!strcmp(addresses[1],substring)){
-    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1:    </p><p> Data2: %s </p><p> Data3:    </p></body></html>", rx_buffer);
-    // }else if(!strcmp(addresses[2],substring)){
-    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data1:    </p><p> Data2:    </p><p> Data3: %s </p></body></html>", rx_buffer);
-    // }else{
-    //     sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s  </p></body></html>", rx_buffer);
-    // }
-    sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s </p></body></html>", rx_buffer);
+    if (!strcmp(addresses[0],substring)){
+        memcpy(data1, rx_buffer, strlen(rx_buffer)+1);
+    }else if (!strcmp(addresses[1],substring)){
+        memcpy(data2, rx_buffer, strlen(rx_buffer)+1);
+    }else if (!strcmp(addresses[2],substring)){
+        memcpy(data3, rx_buffer, strlen(rx_buffer)+1);
+    }
+
+    sprintf(page, "<html> <head> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); }</style> </head> <body> <div class=\"t\"> <p> Data1: %s </p> <p> Data2: %s </p> <p> Data3: %s </p> </div> </body></html>", data1, data2, data3);
+    //printf(page, "<html> <head> <meta charset=\"utf-8\"> <title>Displaying Variables</title> </head> <body> <h1>Displaying Variables</h1> <p>Variable 1: <span id=\"variable1\"></span></p> <p>Variable 2: <span id=\"variable2\"></span></p> <p>Variable 3: <span id=\"variable3\"></span></p> <script> let variable1 = 'initialValue1'; let variable2 = 'initialValue2'; let variable3 = 'initialValue3'; setInterval(function() { variable1 = 'newValue1'; variable2 = 'newValue2'; variable3 = '%s'; document.getElementById('variable1').innerHTML = variable1; document.getElementById('variable2').innerHTML = variable2; document.getElementById('variable3').innerHTML = variable3; }, 5000); </script> </body></html>", rx_buffer);
     char *data_str = page; // Get the received UDP data from OpenThread devices 
     sprintf(http_str, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", strlen(data_str)); // HTTP Response string
 
@@ -416,6 +425,47 @@ void app_main(void)
             sprintf(data, "%d.%d.%d.%d", IP2STR(&ip_info.ip));
             ssd1306_display_text(&dev, 1, "IP:          ", 16, false); 
             ssd1306_display_text(&dev, 2, data, 16, false);
+
+    //             for(int j=0;j<4;j++){
+    //     ESP_LOGI(TAG, "------------------- %s", addresses1[j]);
+    // }
+
+
+
             vTaskDelay(10000 / portTICK_PERIOD_MS);
         }
 }
+
+
+
+
+/*
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset=\"utf-8\">
+    <title>Displaying Variables</title>
+  </head>
+  <body>
+    <h1>Displaying Variables</h1>
+    <p>Variable 1: <span id="variable1"></span></p>
+    <p>Variable 2: <span id="variable2"></span></p>
+    <p>Variable 3: <span id="variable3"></span></p>
+    <script>
+      let variable1 = 'initialValue1';
+      let variable2 = 'initialValue2';
+      let variable3 = 'initialValue3';
+
+      setInterval(function() {
+        variable1 = 'newValue1';
+        variable2 = 'newValue2';
+        variable3 = 'newValue3';
+
+        document.getElementById('variable1').innerHTML = variable1;
+        document.getElementById('variable2').innerHTML = variable2;
+        document.getElementById('variable3').innerHTML = variable3;
+      }, 5000);
+    </script>
+  </body>
+</html>
+*/

@@ -134,6 +134,12 @@
 		status = "okay";
 		label = "BME688";
 	};
+	lis3dh_sensor: lis3dh@19 {
+		compatible = "st,lis3dh";
+		reg = <0x19>;
+		status = "okay";
+		label = "LIS3DH";
+	};
 };
 
 &i2c1 {
