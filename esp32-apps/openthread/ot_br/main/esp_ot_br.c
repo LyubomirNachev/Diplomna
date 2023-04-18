@@ -297,6 +297,7 @@ static void ws_async_resp(void *arg)
 {
     char http_str[150];
     char page[1000];
+    //char page[1500];
     //sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s </p></body></html>", rx_buffer);
     char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
 
@@ -316,9 +317,10 @@ static void ws_async_resp(void *arg)
     }else if (!strcmp(addresses[2],substring)){
         memcpy(data3, rx_buffer, strlen(rx_buffer)+1);
     }
-
-    sprintf(page, "<html> <head> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); }</style> </head> <body> <div class=\"t\"> <p> Data1: %s </p> <p> Data2: %s </p> <p> Data3: %s </p> </div> </body></html>", data1, data2, data3);
-    //printf(page, "<html> <head> <meta charset=\"utf-8\"> <title>Displaying Variables</title> </head> <body> <h1>Displaying Variables</h1> <p>Variable 1: <span id=\"variable1\"></span></p> <p>Variable 2: <span id=\"variable2\"></span></p> <p>Variable 3: <span id=\"variable3\"></span></p> <script> let variable1 = 'initialValue1'; let variable2 = 'initialValue2'; let variable3 = 'initialValue3'; setInterval(function() { variable1 = 'newValue1'; variable2 = 'newValue2'; variable3 = '%s'; document.getElementById('variable1').innerHTML = variable1; document.getElementById('variable2').innerHTML = variable2; document.getElementById('variable3').innerHTML = variable3; }, 5000); </script> </body></html>", rx_buffer);
+    //sprintf(page, "<html> <head> <meta charset="utf-8"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); }</style> </head> <body> <div class="t"> <p> Data1: %s </p> <p> Data2: %s </p> <p> Data3: %s </p> </div> </body></html>", data1, data2, data3);
+    //sprintf(page, "<html><body><h2>Demo JavaScript in Body</h2><p id=\"demo\">A Paragraph.</p><button type=\"button\" onclick=\"myFunction()\">Try it</button><script>function myFunction() { document.getElementById(\"demo\").innerHTML = \"%s\";}</script></body></html>", data1);
+    sprintf(page, "<html> <head> <link rel=\"shortcut icon\" href=\"#\"> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); } </style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\"> </span> </p> </div> <script> let gateway = new WebSocket(`ws://${window.location.hostname}/ws`); gateway.onopen = function (event) { console.log('Connection opened'); }; gateway.onmessage = function (event) { console.log(event.data); document.getElementById('data1').innerHTML = \"%s\"; }; gateway.onclose = function(event) { console.log(\"oh oh\") }; setInterval(function(){gateway.send(\"update data\");},1000);</script> </body></html>", data1);
+    //sprintf(page, "<html> <head> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); }</style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\">%s</span> </p> </div> <script> var gateway = `ws://${window.location.hostname}/ws`; var websocket; window.addEventListener('load', onLoad); function initWebSocket() { console.log('Trying to open a WebSocket connection...'); websocket = new WebSocket(gateway); websocket.onopen = onOpen; websocket.onclose = onClose; websocket.onmessage = onMessage; // <-- add this line } function onOpen(event) { console.log('Connection opened'); } function onClose(event) { console.log('Connection closed'); setTimeout(initWebSocket, 2000); } function onMessage(event) { var data1; console.log(event.data); data1 = \"%s\"; document.getElementById('data1').innerHTML = data1; } function onLoad(event) { initWebSocket(); } </script> </body></html>", data1, data1);
     char *data_str = page; // Get the received UDP data from OpenThread devices 
     sprintf(http_str, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", strlen(data_str)); // HTTP Response string
 
@@ -435,37 +437,3 @@ void app_main(void)
             vTaskDelay(10000 / portTICK_PERIOD_MS);
         }
 }
-
-
-
-
-/*
-<!DOCTYPE html>
-<html>
-  <head>
-  <meta charset=\"utf-8\">
-    <title>Displaying Variables</title>
-  </head>
-  <body>
-    <h1>Displaying Variables</h1>
-    <p>Variable 1: <span id="variable1"></span></p>
-    <p>Variable 2: <span id="variable2"></span></p>
-    <p>Variable 3: <span id="variable3"></span></p>
-    <script>
-      let variable1 = 'initialValue1';
-      let variable2 = 'initialValue2';
-      let variable3 = 'initialValue3';
-
-      setInterval(function() {
-        variable1 = 'newValue1';
-        variable2 = 'newValue2';
-        variable3 = 'newValue3';
-
-        document.getElementById('variable1').innerHTML = variable1;
-        document.getElementById('variable2').innerHTML = variable2;
-        document.getElementById('variable3').innerHTML = variable3;
-      }, 5000);
-    </script>
-  </body>
-</html>
-*/

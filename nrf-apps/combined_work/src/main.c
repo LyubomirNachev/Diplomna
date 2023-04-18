@@ -8,7 +8,16 @@
 #include <openthread/udp.h>
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/drivers/adc.h>
+#include <zephyr/drivers/gpio.h>
 
+
+//led
+static struct gpio_dt_spec led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios,
+						     {0});
+static struct gpio_dt_spec power_on_led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led1_blue), gpios,
+						     {0});
+int power_on_val = 1;
+int val = 0;
 
 //Battery
 #define ADC_NODE DT_NODELABEL(adc)
@@ -74,15 +83,22 @@ static void udp_send(int light, int temp1, int temp2, int hum1, int hum2,
 	}while(false);
 	
 	if(error == OT_ERROR_NONE){
+		gpio_pin_configure_dt(&led, GPIO_OUTPUT);
+		val=1;
+		gpio_pin_set_dt(&led, val);
 		LOG_INF("Send. %s\n", data);
+		k_sleep(K_MSEC(500));
+		val=0;
+		gpio_pin_set_dt(&led, val);
 		//LOG_INF("DEVICEID0: %08X\n", NRF_FICR->DEVICEID[0]);
 		//LOG_INF("DEVICEID0: %08X\n", NRF_FICR->DEVICEID[1]);
+		
 	}else{
 		LOG_INF("udpSend error: %d\n", error);
 	}
 }
 
-
+//lis3dh
 #include <zephyr/drivers/i2c.h>
 #define I2C_NODE                 DT_NODELABEL(i2c0) 
 #define LIS3DH_ADDRESS         0x19
@@ -159,9 +175,11 @@ int8_t xl,yl,zl,xh,yh,zh,stat;
 void config_LIS3DH(void){
 	write_internal_LIS3DH(CTRL_REG1, 0x57);
 	write_internal_LIS3DH(CTRL_REG2, 0x09);
-	write_internal_LIS3DH(CTRL_REG3, 0x40);
+	write_internal_LIS3DH(CTRL_REG3, 0x40); //0x10 ZYXDA interrupt on INT1.
 	write_internal_LIS3DH(CTRL_REG4, 0x00);
-	write_internal_LIS3DH(CTRL_REG5, 0x08);
+	write_internal_LIS3DH(CTRL_REG5, 0x08); // 0x04 4D enable: 4D detection is enabled on INT1 when 6D bit on INT1_CFG is set to 1
+	write_internal_LIS3DH(REFERENCE, 0x05); //Reference value for Interrupt generation. Default value: 0000 0000
+	write_internal_LIS3DH(INT1_CFG, 0x2A);
 	write_internal_LIS3DH(INT1_THS, 0x10);
 	write_internal_LIS3DH(INT1_DURATION, 0x03);
 }
@@ -175,12 +193,26 @@ void read_LIS3DH_data(void){
 	zl = read_internal_LIS3DH(OUT_Z_L);
 	zh = read_internal_LIS3DH(OUT_Z_H);
 	stat = read_internal_LIS3DH(WHO_AM_I);
-	LOG_INF("X: %d,%d Y: %d,%d, Z: %d,%d INFO: %d", xh,xl,yh,yl,zh,zl,stat);
+	int16_t x = xh;
+	x <<= 8;
+	x |= xl;
+	x>>=6;
+	int16_t y = yh;
+	y <<= 8;
+	y |= yl;
+	y>>=6;
+	int16_t z = zh;
+	z <<= 8;
+	z |= zl;
+	z>>=6;
+	LOG_INF("X: %d Y: %d, Z: %d INFO: %d INTERRUPT: %d", x,y,z,stat,intsrc);
 }
-
+ //lis3dh
 
 void main(void)
 {
+	gpio_pin_configure_dt(&power_on_led, GPIO_OUTPUT);
+	gpio_pin_set_dt(&power_on_led, power_on_val);
 	int ret;
 	const struct device *dev;
 	int adc = adc_channel_setup(adc_dev, &chl0_cfg);
@@ -230,6 +262,6 @@ void main(void)
 		udp_send(getLux(), temp.val1, temp.val2, humidity.val1, humidity.val2,
 				 press.val1, press.val2, gas_res.val1, gas_res.val2, mv_value);
 
-		k_sleep(K_MSEC(1000));
+		k_sleep(K_MSEC(3000));
 	}
 }
