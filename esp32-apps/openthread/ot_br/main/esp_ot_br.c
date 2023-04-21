@@ -279,7 +279,7 @@ exit: // On error
 }
 
 /* Websocket functions */
-
+httpd_handle_t server = NULL;
 // Asynchronous response data structure
 struct async_resp_arg {
     httpd_handle_t hd;  // Server instance 
@@ -293,22 +293,14 @@ char data3[110];
     char addresses1[10][17];
     int i;
 // Send an HTTP response asynchronously
-static void ws_async_resp(void *arg) 
-{
-    char http_str[150];
-    char page[1000];
-    //char page[1500];
-    //sprintf(page, "<html> <head><meta charset=\"utf-8\"><title>Data</title></head><body><p> Data: %s </p></body></html>", rx_buffer);
-    char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
+char* page_html = "<!DOCTYPE html> <html> <head> <link rel=\"shortcut icon\" href=\"#\"> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); } </style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\"> </span> </p> </div> <script> let gateway = new WebSocket(`ws://${window.location.hostname}/ws`); gateway.onopen = function (event) { console.log('Connection opened'); }; gateway.onmessage = function (event) { console.log(event.data); document.getElementById('data1').innerHTML = \"hihiihihiih\"; }; gateway.onclose = function(event) { console.log(\"oh oh\") }; setInterval(function(){gateway.send(\"update data\");},1000);</script> </body></html>";
+char page[1100];
 
-    // for (i=0;i<10;i++){
-    //     if (addresses1[i] != NULL && addresses1[i] == substring){
-    //         break;
-    //     }else if (addresses1[i] == NULL && adr_temp != addresses1[i]){
-    //         memcpy(addresses1[i], substring, strlen(substring)+1);
-    //         memcpy(adr_temp, addresses1[i], strlen(addresses1[i])+1);
-    //     }
-    // }
+static void ws_async_send(void *arg) 
+{
+
+    
+    char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
 
     if (!strcmp(addresses[0],substring)){
         memcpy(data1, rx_buffer, strlen(rx_buffer)+1);
@@ -317,61 +309,166 @@ static void ws_async_resp(void *arg)
     }else if (!strcmp(addresses[2],substring)){
         memcpy(data3, rx_buffer, strlen(rx_buffer)+1);
     }
-    //sprintf(page, "<html> <head> <meta charset="utf-8"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); }</style> </head> <body> <div class="t"> <p> Data1: %s </p> <p> Data2: %s </p> <p> Data3: %s </p> </div> </body></html>", data1, data2, data3);
-    //sprintf(page, "<html><body><h2>Demo JavaScript in Body</h2><p id=\"demo\">A Paragraph.</p><button type=\"button\" onclick=\"myFunction()\">Try it</button><script>function myFunction() { document.getElementById(\"demo\").innerHTML = \"%s\";}</script></body></html>", data1);
-    sprintf(page, "<html> <head> <link rel=\"shortcut icon\" href=\"#\"> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); } </style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\"> </span> </p> </div> <script> let gateway = new WebSocket(`ws://${window.location.hostname}/ws`); gateway.onopen = function (event) { console.log('Connection opened'); }; gateway.onmessage = function (event) { console.log(event.data); document.getElementById('data1').innerHTML = \"%s\"; }; gateway.onclose = function(event) { console.log(\"oh oh\") }; setInterval(function(){gateway.send(\"update data\");},1000);</script> </body></html>", data1);
-    //sprintf(page, "<html> <head> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); }</style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\">%s</span> </p> </div> <script> var gateway = `ws://${window.location.hostname}/ws`; var websocket; window.addEventListener('load', onLoad); function initWebSocket() { console.log('Trying to open a WebSocket connection...'); websocket = new WebSocket(gateway); websocket.onopen = onOpen; websocket.onclose = onClose; websocket.onmessage = onMessage; // <-- add this line } function onOpen(event) { console.log('Connection opened'); } function onClose(event) { console.log('Connection closed'); setTimeout(initWebSocket, 2000); } function onMessage(event) { var data1; console.log(event.data); data1 = \"%s\"; document.getElementById('data1').innerHTML = data1; } function onLoad(event) { initWebSocket(); } </script> </body></html>", data1, data1);
-    char *data_str = page; // Get the received UDP data from OpenThread devices 
-    sprintf(http_str, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", strlen(data_str)); // HTTP Response string
 
-    //Initialize the async_resp_arg data structure
-    struct async_resp_arg *resp_arg = (struct async_resp_arg *)arg;
+    httpd_ws_frame_t ws_pkt;
+    struct async_resp_arg *resp_arg = arg;
     httpd_handle_t hd = resp_arg->hd;
     int fd = resp_arg->fd;
+    
+    char buff[4];
+    memset(buff, 0, sizeof(buff));
+    sprintf(buff, "%d", 1);
+    
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.payload = (uint8_t *)buff;
+    ws_pkt.len = strlen(buff);
+    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+    
+    static size_t max_clients = CONFIG_LWIP_MAX_LISTENING_TCP;
+    size_t fds = max_clients;
+    int client_fds[max_clients];
 
-    // Send data to the client
-    ESP_LOGI(TAG, "Executing queued work fd: %d", fd);
-    httpd_socket_send(hd, fd, http_str, strlen(http_str), 0); 
-    httpd_socket_send(hd, fd, data_str, strlen(data_str), 0);
+    esp_err_t ret = httpd_get_client_list(server, &fds, client_fds);
 
-    free(arg);
+    if (ret != ESP_OK) {
+        return;
+    }
+
+    for (int i = 0; i < fds; i++) {
+        int client_info = httpd_ws_get_fd_info(server, client_fds[i]);
+        if (client_info == HTTPD_WS_CLIENT_WEBSOCKET) {
+            httpd_ws_send_frame_async(hd, client_fds[i], &ws_pkt);
+        }
+    }
+    free(resp_arg);
+
+
+
+
+
+
+
+
+    // char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
+
+    // if (!strcmp(addresses[0],substring)){
+    //     memcpy(data1, rx_buffer, strlen(rx_buffer)+1);
+    // }else if (!strcmp(addresses[1],substring)){
+    //     memcpy(data2, rx_buffer, strlen(rx_buffer)+1);
+    // }else if (!strcmp(addresses[2],substring)){
+    //     memcpy(data3, rx_buffer, strlen(rx_buffer)+1);
+    // }
+    // sprintf(page, page_html, data1);
+    // char *data_str = page; // Get the received UDP data from OpenThread devices 
+
+    // //Initialize the async_resp_arg data structure
+    // struct async_resp_arg *resp_arg = (struct async_resp_arg *)arg;
+    // httpd_handle_t hd = resp_arg->hd;
+    // int fd = resp_arg->fd;
+
+    // // Send data to the client
+    // ESP_LOGI(TAG, "Executing queued work fd: %d", fd);
+    // httpd_socket_send(hd, fd, http_str, strlen(http_str), 0); 
+    // httpd_socket_send(hd, fd, data_str, strlen(data_str), 0);
+    
+    // free(arg);
 }
 
-// Handle HTTP GET requests asynchronously (enable full duplex comunication)
-static esp_err_t async_get_handler(httpd_req_t *req) 
-{
-    // Allocate memory for the async_resp_arg data structure
-    struct async_resp_arg *resp_arg = malloc(sizeof(struct async_resp_arg));
 
-    // Define the parameters
+
+esp_err_t get_req_handler(httpd_req_t *req)
+{
+    int response;
+    sprintf(page, page_html, data1);
+    response = httpd_resp_send(req, page, HTTPD_RESP_USE_STRLEN);
+    return response;
+}
+
+
+//int already_established = 0;
+// Handle HTTP GET requests asynchronously (enable full duplex comunication)
+static esp_err_t async_get_handler(httpd_handle_t handle, httpd_req_t *req) 
+{
+    struct async_resp_arg *resp_arg = malloc(sizeof(struct async_resp_arg));
     resp_arg->hd = req->handle;
     resp_arg->fd = httpd_req_to_sockfd(req);
-
-    // Start the queue with the ws_async_resp handler
-    httpd_queue_work(req->handle, ws_async_resp, resp_arg);
-    return ESP_OK;
+    return httpd_queue_work(handle, ws_async_send, resp_arg);
 }
 
 // Define the '/ws' URI for the server that is added at the end of the IP
-static const httpd_uri_t ws = {
-        .uri        = "/ws",
-        .method     = HTTP_GET,
-        .handler    = async_get_handler, // Start the async_get_handler
-        .user_ctx   = NULL,
-        .is_websocket = true
-};
-
-// Start the web server
-static void start_webserver(void) 
+static esp_err_t handle_ws_req(httpd_req_t *req)
 {
-    httpd_handle_t server = NULL;
-    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
-    ESP_LOGI(TAG, "Starting server on port: '%d'", config.server_port);
-    httpd_start(&server, &config);
-    httpd_register_uri_handler(server, &ws);
-}
+    if (req->method == HTTP_GET)
+    {
+        ESP_LOGI(TAG, "Handshake done, the new connection was opened");
+        return ESP_OK;
+    }
 
-/* End of Websocket functions */
+    httpd_ws_frame_t ws_pkt;
+    uint8_t *buf = NULL;
+    memset(&ws_pkt, 0, sizeof(httpd_ws_frame_t));
+    ws_pkt.type = HTTPD_WS_TYPE_TEXT;
+    esp_err_t ret = httpd_ws_recv_frame(req, &ws_pkt, 0);
+    if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "httpd_ws_recv_frame failed to get frame len with %d", ret);
+        return ret;
+    }
+
+    if (ws_pkt.len)
+    {
+        buf = calloc(1, ws_pkt.len + 1);
+        if (buf == NULL)
+        {
+            ESP_LOGE(TAG, "Failed to calloc memory for buf");
+            return ESP_ERR_NO_MEM;
+        }
+        ws_pkt.payload = buf;
+        ret = httpd_ws_recv_frame(req, &ws_pkt, ws_pkt.len);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(TAG, "httpd_ws_recv_frame failed with %d", ret);
+            free(buf);
+            return ret;
+        }
+        ESP_LOGI(TAG, "Got packet with message: %s", ws_pkt.payload);
+    }
+
+    ESP_LOGI(TAG, "frame len is %d", ws_pkt.len);
+
+    if (ws_pkt.type == HTTPD_WS_TYPE_TEXT)
+    {
+        free(buf);
+        return async_get_handler(req->handle, req);
+    }
+    return ESP_OK;
+}
+// Start the web server
+httpd_handle_t start_webserver(void)
+{
+    httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+
+    httpd_uri_t uri_get = {
+        .uri = "/",
+        .method = HTTP_GET,
+        .handler = get_req_handler,
+        .user_ctx = NULL};
+
+    httpd_uri_t ws = {
+        .uri = "/ws",
+        .method = HTTP_GET,
+        .handler = handle_ws_req,
+        .user_ctx = NULL,
+        .is_websocket = true};
+
+    if (httpd_start(&server, &config) == ESP_OK)
+    {
+        httpd_register_uri_handler(server, &uri_get);
+        httpd_register_uri_handler(server, &ws);
+    }
+
+    return server;
+}
 
 void app_main(void)
 {
