@@ -286,30 +286,15 @@ struct async_resp_arg {
     int fd;             // Session socket file descriptor
 };
 
-char data1[110];
-char data2[110];
-char data3[110];
     char adr_temp[17];
     char addresses1[10][17];
     int i;
 // Send an HTTP response asynchronously
-char* page_html = "<!DOCTYPE html> <html> <head> <link rel=\"shortcut icon\" href=\"#\"> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); } </style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\"> </span> </p> </div> <script> let gateway = new WebSocket(`ws://${window.location.hostname}/ws`); gateway.onopen = function (event) { console.log('Connection opened'); }; gateway.onmessage = function (event) { console.log(event.data); document.getElementById('data1').innerHTML = \"hihiihihiih\"; }; gateway.onclose = function(event) { console.log(\"oh oh\") }; setInterval(function(){gateway.send(\"update data\");},1000);</script> </body></html>";
-char page[1100];
+char* page_html = "<!DOCTYPE html> <html> <head> <link rel=\"shortcut icon\" href=\"#\"> <meta charset=\"utf-8\"> <title>Data</title> <style> html{ font-family: Segoe, sans-serif; } body{ background: #454545; } .t{ padding: 12px 12px; border: 8px solid whitesmoke; background-image: linear-gradient(to top, #108db5 0%%, #6f86d6 100%%); } p{ padding: 20px 15px; color:whitesmoke; text-transform: uppercase; border-bottom: solid 2px rgba(210,255,255,0.1); } </style> </head> <body> <div class=\"t\"> <p class = \"data1\"> Data1: <span id=\"data1\"> </span> </p> </div> <script> let gateway = new WebSocket(`ws://${window.location.hostname}/ws`); gateway.onopen = function (event) { console.log('Connection opened'); }; gateway.onmessage = function (event) { console.log(event.data); document.getElementById('data1').innerHTML = \"%s\"; }; gateway.onclose = function(event) { console.log(\"oh oh\") }; setInterval(function(){gateway.send(\"update data\");},1000);</script> </body></html>";
+char page[1500];
 
 static void ws_async_send(void *arg) 
 {
-
-    
-    char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
-
-    if (!strcmp(addresses[0],substring)){
-        memcpy(data1, rx_buffer, strlen(rx_buffer)+1);
-    }else if (!strcmp(addresses[1],substring)){
-        memcpy(data2, rx_buffer, strlen(rx_buffer)+1);
-    }else if (!strcmp(addresses[2],substring)){
-        memcpy(data3, rx_buffer, strlen(rx_buffer)+1);
-    }
-
     httpd_ws_frame_t ws_pkt;
     struct async_resp_arg *resp_arg = arg;
     httpd_handle_t hd = resp_arg->hd;
@@ -378,6 +363,18 @@ static void ws_async_send(void *arg)
 
 esp_err_t get_req_handler(httpd_req_t *req)
 {
+    char data1[200];
+    char data2[110];
+    char data3[110];
+    char* addresses[3] = { "335E5C3FC13D147D", "565C82D311ACA88E", "EEDDAE09C3BE1366" };
+
+    if (!strcmp(addresses[0],substring)){
+        memcpy(data1, rx_buffer, strlen(rx_buffer)+1);
+    }else if (!strcmp(addresses[1],substring)){
+        memcpy(data2, rx_buffer, strlen(rx_buffer)+1);
+    }else if (!strcmp(addresses[2],substring)){
+        memcpy(data3, rx_buffer, strlen(rx_buffer)+1);
+    }
     int response;
     sprintf(page, page_html, data1);
     response = httpd_resp_send(req, page, HTTPD_RESP_USE_STRLEN);
