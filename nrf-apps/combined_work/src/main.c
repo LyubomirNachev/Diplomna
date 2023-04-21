@@ -18,6 +18,7 @@ static struct gpio_dt_spec power_on_led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led1_blue
 						     {0});
 int power_on_val = 1;
 int val = 0;
+//led
 
 //Battery
 #define ADC_NODE DT_NODELABEL(adc)
@@ -48,14 +49,15 @@ struct adc_sequence sequence = {
 };
 //Battery
 
+
 LOG_MODULE_REGISTER(cli_sample, CONFIG_OT_COMMAND_LINE_INTERFACE_LOG_LEVEL);
 
 static void udp_send(int light, int temp1, int temp2, int hum1, int hum2,
- 					 int press1, int press2, int gas1, int gas2, int bat_lvl){
+ 					 int press1, int press2, int gas1, int gas2, char* moved, int bat_lvl){
 	otError	error = OT_ERROR_NONE;
 	char data[300];
-	sprintf(data, "ID:%08X%08X Light: %dlx Temp: %d.%d°C Humidity: %d.%d%% Pressure: %d.%dhPa Gas: %d.%dΩ Battery: %dmV", 
-				    NRF_FICR->DEVICEID[0], NRF_FICR->DEVICEID[1], light, temp1, temp2, hum1, hum2, press1, press2, gas1, gas2, bat_lvl);
+	sprintf(data, "ID:%08X%08X Light: %dlx Temp: %d.%d°C Humidity: %d.%d%% Pressure: %d.%dhPa Gas: %d.%dΩ Moved: %s Battery: %dmV", 
+				    NRF_FICR->DEVICEID[0], NRF_FICR->DEVICEID[1], light, temp1, temp2, hum1, hum2, press1, press2, gas1, gas2, moved, bat_lvl);
 	otInstance *myInstance;
 	myInstance = openthread_get_default_instance();
 	otUdpSocket mySocket;
@@ -184,6 +186,11 @@ void config_LIS3DH(void){
 	write_internal_LIS3DH(INT1_DURATION, 0x03);
 }
 
+int16_t x;
+int16_t y;
+int16_t z;
+char moved[4];
+
 void read_LIS3DH_data(void){
 	intsrc = read_internal_LIS3DH(INT1_SRC);
 	xl = read_internal_LIS3DH(OUT_X_L);
@@ -193,19 +200,26 @@ void read_LIS3DH_data(void){
 	zl = read_internal_LIS3DH(OUT_Z_L);
 	zh = read_internal_LIS3DH(OUT_Z_H);
 	stat = read_internal_LIS3DH(WHO_AM_I);
-	int16_t x = xh;
+
+	x = xh;
 	x <<= 8;
 	x |= xl;
 	x>>=6;
-	int16_t y = yh;
+
+	y = yh;
 	y <<= 8;
 	y |= yl;
 	y>>=6;
-	int16_t z = zh;
+
+	z = zh;
 	z <<= 8;
 	z |= zl;
 	z>>=6;
-	LOG_INF("X: %d Y: %d, Z: %d INFO: %d INTERRUPT: %d", x,y,z,stat,intsrc);
+
+	intsrc >>= 6;
+	if(intsrc == 1) memcpy(moved, "yes", strlen("yes"));
+	else memcpy(moved, "no", strlen("no")+1);
+	LOG_INF("X: %d Y: %d, Z: %d INFO: %d Moved: %s", x,y,z,stat,moved);
 }
  //lis3dh
 
@@ -252,7 +266,9 @@ void main(void)
 		sensor_channel_get(dev_bme, SENSOR_CHAN_PRESS, &press);
 		sensor_channel_get(dev_bme, SENSOR_CHAN_HUMIDITY, &humidity);
 		sensor_channel_get(dev_bme, SENSOR_CHAN_GAS_RES, &gas_res);
-
+		temp.val2 = temp.val2/10000;
+		humidity.val2 = humidity.val2/10000;
+		press.val2 = press.val2/1000;
 		adc = adc_read(adc_dev, &sequence);
 		//LOG_INF("ADC: %d\n", sample_buffer[0]);
 		int32_t mv_value = sample_buffer[0];
@@ -260,8 +276,7 @@ void main(void)
 		adc_raw_to_millivolts(adc_vref, ADC_GAIN, ADC_RESOLUTION, &mv_value);
 		read_LIS3DH_data();
 		udp_send(getLux(), temp.val1, temp.val2, humidity.val1, humidity.val2,
-				 press.val1, press.val2, gas_res.val1, gas_res.val2, mv_value);
-
+				 press.val1, press.val2, gas_res.val1, gas_res.val2, moved, mv_value);
 		k_sleep(K_MSEC(3000));
 	}
 }
